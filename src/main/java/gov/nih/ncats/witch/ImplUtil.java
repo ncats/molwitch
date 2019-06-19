@@ -22,9 +22,7 @@ package gov.nih.ncats.witch;
 import gov.nih.ncats.common.util.CachedSupplier;
 import gov.nih.ncats.witch.spi.ChemicalImplFactory;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,7 +34,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class ImplUtil {
 
-	private static ThreadLocal<ServiceLoader<ChemicalImplFactory>> implLoaders = ThreadLocal.withInitial( ()-> ServiceLoader.load(ChemicalImplFactory.class));
+	private static CachedSupplier<List<ChemicalImplFactory>> implLoaders = CachedSupplier.runOnce( ()-> {
+		List<ChemicalImplFactory> list = new ArrayList<>();
+		for(ChemicalImplFactory f : ServiceLoader.load(ChemicalImplFactory.class)){
+			list.add(f);
+		}
+		return list;
+	});
 	private static CachedSupplier<ChemicalImplFactory> defaultFactory = CachedSupplier.of(()->{
 		
 		Iterator<ChemicalImplFactory> iter = implLoaders.get().iterator();

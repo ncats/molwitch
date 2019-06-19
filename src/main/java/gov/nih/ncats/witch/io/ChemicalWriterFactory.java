@@ -23,19 +23,27 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
 
+import gov.nih.ncats.common.io.IOUtil;
+import gov.nih.ncats.common.util.CachedSupplier;
 import gov.nih.ncats.witch.Chemical;
 import gov.nih.ncats.witch.io.ChemFormat.ChemFormatWriterSpecification;
-import gov.nih.ncats.witch.internal.IOUtil;
 import gov.nih.ncats.witch.spi.ChemicalWriterImplFactory;
 
 public final class ChemicalWriterFactory {
 
-//	private static ThreadLocal<ServiceLoader<ChemicalWriterImplFactory>> loader = ThreadLocal.withInitial(()->ServiceLoader.load(ChemicalWriterImplFactory.class));
-	
-	
+
+	private static CachedSupplier<List<ChemicalWriterImplFactory>>	writers = CachedSupplier.runOnce(()->{
+		List<ChemicalWriterImplFactory> list = new ArrayList<>();
+		for(ChemicalWriterImplFactory w : ServiceLoader.load(ChemicalWriterImplFactory.class)){
+			list.add(w);
+		}
+		return list;
+	});
 	private ChemicalWriterFactory(){
 		//can not instantiate
 	}
@@ -71,8 +79,7 @@ public final class ChemicalWriterFactory {
 		//can't cache because options could be different
 		//and return different factory for the same format
 		//(ex: mol v2000 vs v3000)
-		for(ChemicalWriterImplFactory factory  : ServiceLoader.load(ChemicalWriterImplFactory.class, 
-				Thread.currentThread().getContextClassLoader())){
+		for(ChemicalWriterImplFactory factory  : writers.get()){
 			if(factory.supports(spec)){
 				return factory;
 			}

@@ -19,16 +19,25 @@
 package gov.nih.ncats.witch.inchi;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gov.nih.ncats.common.util.CachedSupplier;
 import gov.nih.ncats.witch.Chemical;
 import gov.nih.ncats.witch.spi.InchiImplFactory;
 
 public final class Inchi {
 
-	private static ThreadLocal<ServiceLoader<InchiImplFactory>> implLoaders = ThreadLocal.withInitial(()->ServiceLoader.load(InchiImplFactory.class));
+	private static CachedSupplier<List<InchiImplFactory>> implLoaders = CachedSupplier.runOnce(()->{
+		List<InchiImplFactory> list = new ArrayList<>();
+		for(InchiImplFactory i : ServiceLoader.load(InchiImplFactory.class)){
+			list.add(i);
+		}
+		return list;
+	});
 	private static Pattern STD_INCHI_PREFIX = Pattern.compile("^\\s*InChI=1S/");
 	
 	public static InChiResult asStdInchi(Chemical chemical) throws IOException{
@@ -48,7 +57,7 @@ public final class Inchi {
 	public static Chemical toChemical(String inchi) throws IOException{
 		Matcher matcher = STD_INCHI_PREFIX.matcher(inchi);
 		if(!matcher.find()) {
-			
+			//TODO should we error out here?
 		}
 		for(InchiImplFactory impl : implLoaders.get()) {
 			Chemical result =  impl.parseInchi(inchi);

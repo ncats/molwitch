@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
+import gov.nih.ncats.common.util.CachedSupplier;
 import gov.nih.ncats.witch.spi.FingerprinterImpl;
 /**
  * Lookup for the different {@link Fingerprint}
@@ -35,18 +36,31 @@ import gov.nih.ncats.witch.spi.FingerprinterImpl;
  */
 public class Fingerprinters {
 
-	private static ThreadLocal<ServiceLoader<FingerprinterImpl>> loader = ThreadLocal.withInitial(() ->ServiceLoader.load(FingerprinterImpl.class));
-	 
-	private static Fingerprinter defaultImpl;
-	
-	static{
-		for(FingerprinterImpl f : loader.get()){
-			if(f.isDefault()){
-				defaultImpl = f.createDefaultFingerprinter();
-				break;
-			}
+	private static CachedSupplier<List<FingerprinterImpl>> loader = CachedSupplier.runOnce(() ->{
+		List<FingerprinterImpl> list = new ArrayList<>();
+		for(FingerprinterImpl f : ServiceLoader.load(FingerprinterImpl.class)){
+			list.add(f);
 		}
-	}
+		return list;
+	});
+	 
+	private static CachedSupplier<Fingerprinter> defaultImpl = CachedSupplier.of(()-> {
+				Iterator<FingerprinterImpl> iter = loader.get().iterator();
+				if (!iter.hasNext()) {
+					return null;
+				}
+				FingerprinterImpl def = iter.next();
+				while (iter.hasNext()) {
+					FingerprinterImpl f = iter.next();
+					if (f.isDefault()) {
+						def = f;
+						break;
+					}
+				}
+				return def.createDefaultFingerprinter();
+			}
+		);
+
 	
 		public static class PathBasedSpecification implements FingerprintSpecification{
 			public static final int DEFAULT_LENGTH =1024;
@@ -238,6 +252,6 @@ public class Fingerprinters {
 	 *
 	 */
 	public static Fingerprinter getDefault() {
-		return defaultImpl;
+		return defaultImpl.get();
 	}
 }
