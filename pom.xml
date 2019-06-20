@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ NCATS-WITCH
+  ~ NCATS-MOLWITCH
   ~
   ~ Copyright 2019 NIH/NCATS
   ~
@@ -23,12 +23,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>gov.nih.ncats</groupId>
-    <artifactId>witch</artifactId>
+    <artifactId>molwitch</artifactId>
     <version>0.5</version>
 
-    <name>ncats-witch</name>
+    <name>ncats-molwitch</name>
 
-    <url>https://spotlite.nih.gov/ncats/witch/</url>
+    <url>https://spotlite.nih.gov/ncats/molwitch/</url>
     <description>A Bridge interface to abstract the underlying cheminformatics library is used.</description>
     <organization>
         <name>NIH/NCATS</name>
@@ -56,7 +56,7 @@
     </developers>
 
     <scm>
-        <url>https://spotlite.nih.gov/ncats/witch</url>
+        <url>https://spotlite.nih.gov/ncats/molwitch</url>
     </scm>
 
     <distributionManagement>
