@@ -23,7 +23,7 @@ import java.util.ServiceLoader;
 import gov.nih.ncats.common.util.CachedSupplier;
 import gov.nih.ncats.molwitch.spi.WitchModule;
 
-public class Witch {
+public class MolWitch {
 	private static CachedSupplier<WitchModule> loadedModule = CachedSupplier.runOnce(()->{
 		WitchModule mod=null;
 		for(WitchModule m : ServiceLoader.load(WitchModule.class)){

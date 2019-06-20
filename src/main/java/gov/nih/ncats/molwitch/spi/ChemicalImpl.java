@@ -178,7 +178,7 @@ public interface ChemicalImpl<T extends ChemicalImpl<T>> {
 	 * corrupt this ChemicalImpl.
 	 * <p>
 	 * This method should only be called when trying to perform functionality
-	 * not yet defined by a Witch API call!
+	 * not yet defined by a MolWitch API call!
 	 * </p>
 	 * 
 	 * 
