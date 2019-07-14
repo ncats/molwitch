@@ -38,6 +38,12 @@ public interface Atom {
 	 * @return the atomic number; should always be &ge; 1.
 	 */
 	int getAtomicNumber();
+
+	/**
+	 * Set the atomic number of this atom.
+	 * @param atomicNumber
+	 */
+	void setAtomicNumber(int atomicNumber);
 	/**
 	 * Get the symbol for this atom, for example
 	 * for Hydrogen, this method will return "H".
@@ -64,11 +70,18 @@ public interface Atom {
 	 * @return the charge value.
 	 */
 	int getCharge();
+
+
+	int getRadical();
+
+	void setRadical(int radical);
 	
 	AtomCoordinates getAtomCoordinates();
 	void setAtomCoordinates(AtomCoordinates atomCoordinates);
 	
 	Chirality getChirality();
+
+	void setChirality(Chirality chirality);
 	
 	double getExactMass();
 	/**

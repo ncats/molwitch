@@ -41,19 +41,18 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import java.util.NoSuchElementException;
 
+import gov.nih.ncats.molwitch.inchi.InChiResult;
+import gov.nih.ncats.molwitch.inchi.Inchi;
+import gov.nih.ncats.molwitch.io.*;
 import gov.nih.ncats.molwitch.spi.ChemicalImplFactory;
 import gov.nih.ncats.common.functions.IndexedConsumer;
 import gov.nih.ncats.molwitch.Bond.BondType;
 import gov.nih.ncats.molwitch.SGroup.SGroupType;
-import gov.nih.ncats.molwitch.io.ChemFormat.SmilesChemFormat;
 import gov.nih.ncats.molwitch.io.ChemFormat.SmilesFormatWriterSpecification;
 import gov.nih.ncats.molwitch.io.ChemFormat.ChemFormatWriterSpecification;
 import gov.nih.ncats.molwitch.io.ChemFormat.MolFormatSpecification;
 import gov.nih.ncats.molwitch.io.ChemFormat.SdfFormatSpecification;
-import gov.nih.ncats.molwitch.io.ChemicalReader;
-import gov.nih.ncats.molwitch.io.ChemicalReaderFactory;
-import gov.nih.ncats.molwitch.io.ChemicalWriter;
-import gov.nih.ncats.molwitch.io.ChemicalWriterFactory;
+import gov.nih.ncats.molwitch.io.ChemFormat.SmartsFormatSpecification;
 import gov.nih.ncats.molwitch.isotopes.Isotope;
 import gov.nih.ncats.molwitch.spi.ChemicalImpl;
 /**
@@ -65,12 +64,13 @@ import gov.nih.ncats.molwitch.spi.ChemicalImpl;
  */
 public class Chemical {
 
-	
+	private static final ChemFormat.SmartsFormatSpecification DEFAULT_SMARTS_SPEC = new SmartsFormatSpecification();
+
 	private static final SdfFormatSpecification DEFAULT_SDF_SPEC = new SdfFormatSpecification();
 
 	private static final MolFormatSpecification DEFAULT_MOL_SPEC = new MolFormatSpecification();
 
-	private static final SmilesFormatWriterSpecification DEFAULT_SMILES_SPEC = SmilesChemFormat.createOptions();
+	private static final SmilesFormatWriterSpecification DEFAULT_SMILES_SPEC = new SmilesFormatWriterSpecification();
 	
 	private final ChemicalImpl impl;
 
@@ -204,7 +204,7 @@ public class Chemical {
 	/**
 	 * Create a new {@link Chemical} from the given single SMILES
 	 * encoded String and do not compute the coordinates.
-	 * @param smiles the smiles string to parse;
+	 * @param smarts the smiles string to parse;
 	 * can not be null.
 	 * 
 	 * @return a new Chemical; will never be null.
@@ -237,6 +237,9 @@ public class Chemical {
 		Objects.requireNonNull(impl);
 		this.impl = impl;
 		this.source = source;
+	}
+	public Iterable<Chemical> getConnectedComponents(){
+		return ()-> connectedComponents();
 	}
 	public Stream<Chemical> connectedComponentsAsStream(){
 		return StreamSupport.stream(
@@ -489,6 +492,31 @@ public class Chemical {
 		
 		return impl.indexOf(a);
 	}
+
+	/**
+	 * Get the bond between the given atom indices.
+	 * @param a1 atom 1.
+	 * @param a2 atom2.
+	 * @return an Bond wrapped in an optional.  If there is no bond
+	 * between the 2 atoms, then the optional will be empty; will never be null.
+	 * @throws NullPointerException if either parameter is null.
+	 */
+	public Optional<? extends Bond> getBond(Atom a1, Atom a2){
+		return getBond(a1.getAtomIndexInParent(), a2.getAtomIndexInParent());
+	}
+
+	/**
+	 * Get the bond between the given atom indices.
+	 * @param a1 index of atom 1.
+	 * @param a2 index of atom2.
+	 * @return an Bond wrapped in an optional.  If there is no bond
+	 * between the 2 atoms, then the optional will be empty; will never be null.
+	 */
+	public Optional<? extends Bond> getBond(int a1, int a2){
+		Atom aa1 = getAtom(a1);
+		Atom aa2 = getAtom(a2);
+		return aa1.bondTo(aa2);
+	}
 	/**
 	 * Gets the ith {@link Bond} in this molecule.
 	 * 
@@ -532,7 +560,7 @@ public class Chemical {
 	
 	
 	public Chemical copy(){
-		return new Chemical(impl.shallowCopy(), this.source);
+		return new Chemical(impl.deepCopy(), this.source);
 	}
 	
 	public byte[] formatToBytes(ChemFormatWriterSpecification spec) throws IOException{
@@ -558,7 +586,13 @@ public class Chemical {
 	{
 		return formatToString(spec);
 	}
+	public String toSmarts(SmartsFormatSpecification spec) throws IOException{
+		return formatToString(spec);
+	}
 
+	public InChiResult toInchi() throws IOException{
+			return Inchi.asStdInchi(this, true);
+	}
 	public String toSmiles() throws IOException
 	{
 		return toSmiles(DEFAULT_SMILES_SPEC);
@@ -570,6 +604,10 @@ public class Chemical {
 	public String toSd() throws IOException
 	{
 		return toSd(DEFAULT_SDF_SPEC);
+	}
+
+	public String toSmarts() throws IOException{
+		return toSmarts(DEFAULT_SMARTS_SPEC);
 	}
 	
 	public boolean hasQueryAtoms() {

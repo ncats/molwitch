@@ -30,26 +30,39 @@ public interface ChemFormat {
 
 		
 		String getFormatName();
-		
+
+	}
+
+	interface HydrogenAwareChemFormatWriterSpecification extends ChemFormatWriterSpecification{
+
+
 		HydrogenEncoding getHydrogenEncoding();
 	}
 	
-	interface AromaticAwareChemFormatWriterSpecification extends ChemFormatWriterSpecification{
+	interface AromaticAwareChemFormatWriterSpecification extends HydrogenAwareChemFormatWriterSpecification{
 		KekulizationEncoding getKekulization();
 	}
 	
-	public enum HydrogenEncoding{
+	enum HydrogenEncoding{
 		MAKE_EXPLICIT,
 		MAKE_IMPLICIT,
 		AS_IS;
 	}
-	public enum KekulizationEncoding{
+	enum KekulizationEncoding{
 		KEKULE,
 		FORCE_AROMATIC
 	}
-	public String getName();
-	
-	public static class SdfFormatSpecification implements ChemFormatWriterSpecification{
+	String getName();
+
+	class SmartsFormatSpecification implements ChemFormatWriterSpecification{
+		public static final String NAME = "SMARTS";
+		@Override
+		public String getFormatName() {
+			return NAME;
+		}
+
+	}
+	class SdfFormatSpecification implements HydrogenAwareChemFormatWriterSpecification{
 		public static final String NAME = "sdf";
 		private MolFormatSpecification molSpec = new MolFormatSpecification();
 		
@@ -73,7 +86,7 @@ public interface ChemFormat {
 		
 	}
 	
-	public static class MolFormatSpecification implements AromaticAwareChemFormatWriterSpecification{
+	class MolFormatSpecification implements AromaticAwareChemFormatWriterSpecification{
 		public static final String NAME = "mol";
 		private HydrogenEncoding hydrogenEncoding = HydrogenEncoding.AS_IS; 
 		private Version version = Version.V2000;
@@ -219,7 +232,7 @@ public interface ChemFormat {
 		}
 		@Override
 		public String getFormatName() {
-			return SmilesChemFormat.name();
+			return NAME;
 		}
 		@Override
 		public String toString() {
@@ -228,19 +241,6 @@ public interface ChemFormat {
 		}
 	
 		
-		
-	}
-	public static interface SmilesChemFormat{
-
-		public static String name() {
-			return "SMILES";
-		}
-		
-
-		public static SmilesFormatWriterSpecification createOptions() {
-			return new SmilesFormatWriterSpecification();
-		}
-
 		
 	}
 }

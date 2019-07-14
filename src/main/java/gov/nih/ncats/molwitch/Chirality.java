@@ -25,11 +25,11 @@ public enum Chirality {
 	 */
 	Non_Chiral(0),
 	/**
-	 * Rectus (right). Priority decreases in clockwise direction.
+	 * Rectus (right, odd). Priority decreases in clockwise direction.
 	 */
 	R(1),
 	/**
-	 * Sinister (left). priority decreases in counterclockwise direction.
+	 * Sinister (left, even). priority decreases in counterclockwise direction.
 	 */
 	S(2),
 	Parity_Either(3);

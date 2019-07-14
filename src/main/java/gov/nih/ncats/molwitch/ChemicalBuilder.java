@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,7 +53,7 @@ public class ChemicalBuilder {
 	/**
 	 * Create a new chemical from its Inchi.
 	 * 
-	 * @param name the chemical name to get the Chemical for; can not be null.
+	 * @param inchi the Inchi for; can not be null.
 	 * 
 	 * @return a new Molecule; will never be null.
 	 * 
@@ -212,7 +213,30 @@ public class ChemicalBuilder {
 		this.impl = Objects.requireNonNull(impl);
 		this.source = source;
 	}
-	
+	/**
+	 * Get the bond between the given atom indices.
+	 * @param a1 atom 1.
+	 * @param a2 atom2.
+	 * @return an Bond wrapped in an optional.  If there is no bond
+	 * between the 2 atoms, then the optional will be empty; will never be null.
+	 * @throws NullPointerException if either parameter is null.
+	 */
+	public Optional<? extends Bond> getBond(Atom a1, Atom a2){
+		return getBond(a1.getAtomIndexInParent(), a2.getAtomIndexInParent());
+	}
+
+	/**
+	 * Get the bond between the given atom indices.
+	 * @param a1 index of atom 1.
+	 * @param a2 index of atom2.
+	 * @return an Bond wrapped in an optional.  If there is no bond
+	 * between the 2 atoms, then the optional will be empty; will never be null.
+	 */
+	public Optional<? extends Bond> getBond(int a1, int a2){
+		Atom aa1 = getAtom(a1);
+		Atom aa2 = getAtom(a2);
+		return aa1.bondTo(aa2);
+	}
 	/**
 	 * Get the name of this molecule.
 	 * @return the name or null, if no name is given.
@@ -402,10 +426,10 @@ public class ChemicalBuilder {
 //		bondPath.flipParityFromBuilder(this);
 //		return this;
 //	}
-	public Bond bondAt(int i) {
+	public Bond getBond(int i) {
 		return impl.getBond(i);		
 	}
-	public Atom atomAt(int i) {
+	public Atom getAtom(int i) {
 		return impl.getAtom(i);
 	}
 	
