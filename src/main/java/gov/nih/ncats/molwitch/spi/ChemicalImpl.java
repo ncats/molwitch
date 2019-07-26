@@ -151,7 +151,9 @@ public interface ChemicalImpl<T extends ChemicalImpl<T>> {
 	Iterator<Entry<String,String>> properties();
 	
 	ChemicalSource getSource();
-	
+
+	void removeProperty(String name);
+
 	public static final class PreparationOptions{
 		public final boolean aromatize, makeHydrogensExplicit, computeCoords, computeStereo;
 

@@ -290,7 +290,9 @@ public class Chemical {
 	public String getProperty(String key){		
 		return getProperty(key ,false);
 	}
-	
+	public void removeProperty(String name){
+		impl.removeProperty(name);
+	}
 	/**
 	 * Get the property value with the given key.
 	 * 
@@ -368,7 +370,9 @@ public class Chemical {
 		return impl.getBondCount();
 	}
 	/**
-	 * Get all the properties as a set of key-value pairs.
+	 * Get a copy of all the properties as a set of key-value pairs.
+	 * Warning: since this is a copy, any modifications
+	 * to this map will NOT be reflected in the Chemical.
 	 * 
 	 * @return the Set of properties; will never be null,
 	 * but may be empty if no properties are set.
