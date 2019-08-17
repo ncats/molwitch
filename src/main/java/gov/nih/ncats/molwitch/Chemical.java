@@ -680,7 +680,30 @@ public class Chemical {
 			}
 		}
 	}
-	
+	public boolean removeNonDescriptHydrogens() {
+		if (this.getSGroupCount() == 0) {
+
+			for (Atom ca : atoms().filter(a-> a.getSymbol().equals("H"))
+											.filter(h -> h.getMassNumber() !=0 && h.getRadical() == 0
+													&& h.getChirality().getParity() == 0 && h.getCharge() == 0
+													&& !h.getAtomToAtomMap().isPresent())
+													.collect(Collectors.toList())
+
+			) {
+
+				for (Bond cb : ca.getBonds()) {
+					Atom ca2 = cb.getOtherAtom(ca);
+					if (!ca2.isQueryAtom()) {
+						if (cb.getStereo() == Bond.Stereo.NONE) {
+							this.removeAtom(ca);
+						}
+					}
+				}
+
+			}
+		}
+		return true;
+	}
 	public void makeHydrogensExplicit() {
 		impl.makeHydrogensExplicit();
 		
@@ -721,7 +744,11 @@ public class Chemical {
 	public Optional<ChemicalSource> getSource(){
 		return Optional.ofNullable(source);
 	}
-	
+
+	public int getSGroupCount() {
+		return impl.getSGroupCount();
+	}
+
 	private interface VisitorFilter{
 		boolean shouldVisit(int start, int current, int end);
 	}
@@ -990,5 +1017,99 @@ public class Chemical {
 	
 	public void generateCoordinates() throws ChemkitException{
 		impl.generateCoordinates();
+	}
+
+	public Optional<OpticalActivity> computeOpticalActivity(){
+		int total=0;
+		int defined=0;
+		for(TetrahedralChirality t : getTetrahedrals()){
+			total++;
+			if(t.isDefined()){
+				defined++;
+			}
+		}
+
+		if(total==0){
+			return Optional.of(OpticalActivity.NONE);
+		}
+		if(total == defined){
+			return Optional.of(OpticalActivity.UNSPECIFIED);
+		}
+		if(total ==1 && defined ==0){
+			return Optional.of(OpticalActivity.PLUS_MINUS);
+		}
+		int numUndefined = total- defined;
+		if(numUndefined >=1){
+			return Optional.of(OpticalActivity.UNSPECIFIED);
+		}
+		return Optional.empty();
+	}
+	public Optional<StereochemistryType> computeStereochemistryType(){
+		int total=0;
+		int defined=0;
+		for(TetrahedralChirality t : getTetrahedrals()){
+			total++;
+			if(t.isDefined()){
+				defined++;
+			}
+		}
+
+		if(total==0){
+			return Optional.of(StereochemistryType.ACHIRAL);
+		}
+		if(total == defined){
+			return Optional.of(StereochemistryType.ABSOLUTE);
+		}
+		if(total ==1 && defined ==0){
+			return Optional.of(StereochemistryType.RACEMIC);
+		}
+		int numUndefined = total- defined;
+		if(numUndefined ==1){
+			return Optional.of(StereochemistryType.EPIMERIC);
+		}
+		if(numUndefined >1){
+			return Optional.of(StereochemistryType.MIXED);
+		}
+		return Optional.empty();
+	}
+
+	public enum StereochemistryType{
+		ACHIRAL,ABSOLUTE,RACEMIC,EPIMERIC,MIXED,UNKNOWN;
+
+		}
+
+	public enum OpticalActivity{
+		PLUS("( + )"),
+		MINUS("( - )"),
+		PLUS_MINUS("( + / - )"),
+		UNSPECIFIED("UNSPECIFIED"),
+		NONE("NONE");
+
+		private final String value;
+
+		OpticalActivity(String value) {
+			this.value = value;
+		}
+
+//		@JsonValue
+		public String toValue() {
+			return value.toString();
+		}
+//
+//		@JsonCreator
+		public static OpticalActivity forValue(String value) {
+			if (value.equals("( + )") || value.equals("(+)"))
+				return PLUS;
+			if (value.equals("( - )") || value.equals("(-)"))
+				return MINUS;
+			if (value.equals("( + / - )") || value.equals("(+/-)"))
+				return PLUS_MINUS;
+			if (value.equalsIgnoreCase("unspecified"))
+				return UNSPECIFIED;
+			if (value.equalsIgnoreCase("none")
+					|| value.equalsIgnoreCase("unknown"))
+				return NONE;
+			return null;
+		}
 	}
 }

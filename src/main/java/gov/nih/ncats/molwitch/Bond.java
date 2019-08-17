@@ -87,7 +87,8 @@ public interface Bond {
 		},
 		TRIPLE('#',3),
 		QUADRUPLE('$', 4),
-		AROMATIC(':', 4)
+		AROMATIC(':', 4),
+		SINGLE_OR_DOUBLE('X', 5)
 		;
 		
 		public BondType switchParity(){

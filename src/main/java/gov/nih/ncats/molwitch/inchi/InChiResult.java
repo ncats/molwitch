@@ -33,7 +33,18 @@ public final class InChiResult {
 		WARNING,
 		ERROR
 	}
-	
+
+	@Override
+	public String toString() {
+		return "InChiResult{" +
+				"key='" + key + '\'' +
+				", auxInfo='" + auxInfo + '\'' +
+				", inchi='" + inchi + '\'' +
+				", message='" + message + '\'' +
+				", stuatus=" + stuatus +
+				'}';
+	}
+
 	private InChiResult(Status stuatus, String key, String inchi, String auxInfo, String message) {
 		Objects.requireNonNull(stuatus);
 		Objects.requireNonNull(key);

@@ -20,6 +20,11 @@ package gov.nih.ncats.molwitch;
 
 import java.util.List;
 
+/**
+ * A candidate for
+ * a stereo center (Stereogenic) not all stereocenters
+ * are necessarily present, see {@link Stereocenter#isDefined()}.
+ */
 public interface Stereocenter {
 
 	Atom getCenterAtom();
@@ -27,5 +32,7 @@ public interface Stereocenter {
 	Chirality getChirality();
 
 	List<Atom> getPeripheralAtoms();
+
+	boolean isDefined();
 
 }

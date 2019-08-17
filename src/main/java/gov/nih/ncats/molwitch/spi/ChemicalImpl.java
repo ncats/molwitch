@@ -154,6 +154,8 @@ public interface ChemicalImpl<T extends ChemicalImpl<T>> {
 
 	void removeProperty(String name);
 
+	int getSGroupCount();
+
 	public static final class PreparationOptions{
 		public final boolean aromatize, makeHydrogensExplicit, computeCoords, computeStereo;
 

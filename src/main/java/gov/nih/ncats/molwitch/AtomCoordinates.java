@@ -25,6 +25,8 @@ import java.util.OptionalDouble;
 public abstract class AtomCoordinates implements Comparable<AtomCoordinates>{
 
 
+	public static final AtomCoordinates ORIGIN_2D = AtomCoordinates.valueOf(0,0);
+	public static final AtomCoordinates ORIGIN_3D = AtomCoordinates.valueOf(0,0, 0);
 	public static final Comparator<AtomCoordinates> DEFAULT_COMPARATOR = Comparator.comparingDouble(AtomCoordinates::getY)
 			.thenComparing(Comparator.comparingDouble(AtomCoordinates::getX));
 
