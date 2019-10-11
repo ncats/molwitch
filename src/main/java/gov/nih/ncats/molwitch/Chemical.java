@@ -684,7 +684,7 @@ public class Chemical {
 		if (this.getSGroupCount() == 0) {
 
 			for (Atom ca : atoms().filter(a-> a.getSymbol().equals("H"))
-											.filter(h -> h.getMassNumber() !=0 && h.getRadical() == 0
+                                          .filter(h -> h.getMassNumber() ==0 && h.getRadical() == 0
 													&& h.getChirality().getParity() == 0 && h.getCharge() == 0
 													&& !h.getAtomToAtomMap().isPresent())
 													.collect(Collectors.toList())
