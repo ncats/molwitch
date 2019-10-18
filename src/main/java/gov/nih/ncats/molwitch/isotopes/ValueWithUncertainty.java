@@ -29,10 +29,19 @@ public class ValueWithUncertainty implements Comparable<ValueWithUncertainty>{
 	private final BigDecimal lowerBounds, upperBounds;
 	
 	private static final Pattern pattern = Pattern.compile("(\\d*\\.\\d+)\\((\\d+)\\)?");
-	
+	private static final Pattern integerPattern = Pattern.compile("(\\d+)");
+
 	public static ValueWithUncertainty parse(String s) {
 		Matcher m = pattern.matcher(s);
 		if(!m.find()) {
+			m = integerPattern.matcher(s);
+			if(m.find()){
+				try {
+					return new ValueWithUncertainty(new BigDecimal(s), BigDecimal.ZERO);
+				}catch(NumberFormatException e){
+					throw new IllegalArgumentException("could not parse " + s,e);
+				}
+			}
 			throw new IllegalArgumentException("'"+ s +"' does not match valid pattern " + pattern.pattern());
 		}
 		String value = m.group(1);
@@ -93,7 +102,15 @@ public class ValueWithUncertainty implements Comparable<ValueWithUncertainty>{
 			return false;
 		return true;
 	}
-	
+
+	public BigDecimal getLowerBounds() {
+		return lowerBounds;
+	}
+
+	public BigDecimal getUpperBounds() {
+		return upperBounds;
+	}
+
 	public boolean meetsCriteria(BigDecimal value) {
 		return lowerBounds.compareTo(value) <=0 && upperBounds.compareTo(value) >=0;
 	}

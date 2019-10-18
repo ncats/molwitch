@@ -25,12 +25,14 @@ public class WeightInterval {
 
 	private final double lower, upper;
 
-	private static final Pattern pattern = Pattern.compile("\\[\\s*(\\d+\\.\\d+)\\s*,\\s*(\\\\d+\\\\.\\\\d+)\\\\s*\\]");
+	private static final Pattern pattern = Pattern.compile("\\[\\s*(\\d+\\.\\d+)\\s*,\\s*(\\d+\\.\\d+)\\s*\\]");
 	
 	public static WeightInterval parse(String s) {
 		Matcher m = pattern.matcher(s);
 		if(!m.find()) {
-			throw new IllegalArgumentException("'"+s+"' does not match interval pattern");
+			ValueWithUncertainty v = ValueWithUncertainty.parse(s);
+			return new WeightInterval(v.getLowerBounds().doubleValue(), v.getUpperBounds().doubleValue());
+//			throw new IllegalArgumentException("'"+s+"' does not match interval pattern");
 		}
 		return new WeightInterval(Double.parseDouble(m.group(1)), Double.parseDouble(m.group(2)));
 		

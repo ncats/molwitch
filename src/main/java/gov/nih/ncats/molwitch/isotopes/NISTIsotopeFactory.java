@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import gov.nih.ncats.molwitch.isotopes.Isotope.IsotopeBuilder;
 
@@ -36,9 +38,12 @@ public enum NISTIsotopeFactory implements IsotopeFactory{
 	private static final Map<String, Set<Isotope>> SYMBOL_MAP = new HashMap<>();
 	private static final Map<Integer, Set<Isotope>> ATNO_MAP = new HashMap<>();
 	static {
+
+		Pattern RADIOACTIVE_PATTERN = Pattern.compile("\\[(\\d+)\\]");
+		Pattern NBSP_PATTERN = Pattern.compile("&nbsp;");
 		Map<String, Set<Isotope>> bySymbol = new HashMap<>();
 		Map<Integer, Set<Isotope>> byAtno = new HashMap<>();
-		try(InputStream in = NISTIsotopeFactory.class.getResourceAsStream("elements.NIST.2017.txt");
+		try(InputStream in = NISTIsotopeFactory.class.getResourceAsStream("/elements.NIST.2017.txt");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in, Charset.forName("UTF-8")));	
 			){
 			String line;
@@ -57,6 +62,7 @@ public enum NISTIsotopeFactory implements IsotopeFactory{
 				}
 				String key = line.substring(0, offset).trim();
 				String value = line.substring(offset+1).trim();
+				value = NBSP_PATTERN.matcher(value).replaceAll(" ").trim();
 				if(value.isEmpty()) {
 					continue;
 				}
@@ -70,7 +76,13 @@ public enum NISTIsotopeFactory implements IsotopeFactory{
 										break;
 				case "Isotopic Composition" : builder.setIsotopicComposition(ValueWithUncertainty.parse(value));
 										break;		
-				case "Standard Atomic Weight" : builder.setStandardAtomicWeight(WeightInterval.parse(value));
+				case "Standard Atomic Weight" :
+					//radioactive values sometimes are in brackets like [98]
+					Matcher m = RADIOACTIVE_PATTERN.matcher(value);
+					if(m.find()){
+						value = m.group(1);
+					}
+					builder.setStandardAtomicWeight(WeightInterval.parse(value));
 										break;
 										
 				default: //no op
@@ -86,7 +98,7 @@ public enum NISTIsotopeFactory implements IsotopeFactory{
 			
 			
 		}catch(Exception e) {
-			
+			e.printStackTrace();
 		}
 		
 		bySymbol.entrySet().forEach(e-> SYMBOL_MAP.put(e.getKey(), Collections.unmodifiableSet(e.getValue())));

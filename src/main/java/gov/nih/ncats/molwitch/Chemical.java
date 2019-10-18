@@ -24,22 +24,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.Stack;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import java.util.NoSuchElementException;
 
 import gov.nih.ncats.molwitch.inchi.InChiResult;
 import gov.nih.ncats.molwitch.inchi.Inchi;
@@ -680,27 +669,54 @@ public class Chemical {
 			}
 		}
 	}
+
+	/**
+	 * Remove explicit Hydrogens that don't have any special
+	 * properties set such as:
+	 * <ul>
+	 *     <li>mass</li>
+	 *     <li>charge</li>
+	 *     <li>atom to atom mapping</li>
+	 *     <li>radical</li>
+	 *     <li>parity</li>
+	 *     <li>In an S-group or connected to an atom in an S-group</li>
+	 *     <li>connected to a query atom</li>
+	 *     <li>has defined stereo bond</li>
+	 * </ul>
+	 * @return true (currently always even if nothing is removed)
+	 */
 	public boolean removeNonDescriptHydrogens() {
-		if (this.getSGroupCount() == 0) {
 
-			for (Atom ca : atoms().filter(a-> a.getSymbol().equals("H"))
-                                          .filter(h -> h.getMassNumber() ==0 && h.getRadical() == 0
-													&& h.getChirality().getParity() == 0 && h.getCharge() == 0
-													&& !h.getAtomToAtomMap().isPresent())
-													.collect(Collectors.toList())
+		Stream<Atom> atomsToCheck = atoms();
+		if (this.hasSGroups()) {
 
-			) {
+			Stream<Atom> atomsToIgnore = Stream.empty();
+			for(SGroup sgroup : this.getSGroups()){
+				atomsToIgnore = Stream.concat(atomsToIgnore, sgroup.getAtoms());
+				atomsToIgnore = Stream.concat(atomsToIgnore,  sgroup.getOutsideNeighbors());
+			}
+			Set<Atom> ignoreSet = atomsToIgnore.collect(Collectors.toSet());
 
-				for (Bond cb : ca.getBonds()) {
-					Atom ca2 = cb.getOtherAtom(ca);
-					if (!ca2.isQueryAtom()) {
-						if (cb.getStereo() == Bond.Stereo.NONE) {
-							this.removeAtom(ca);
-						}
+			atomsToCheck = atomsToCheck.filter(a-> !ignoreSet.contains(a));
+		}
+
+		for (Atom ca : atomsToCheck.filter(a-> a.getSymbol().equals("H"))
+				.filter(h -> h.getMassNumber() ==0 && h.getRadical() == 0
+						&& h.getChirality().getParity() == 0 && h.getCharge() == 0
+						&& !h.getAtomToAtomMap().isPresent())
+				.collect(Collectors.toList())
+
+		) {
+
+			for (Bond cb : ca.getBonds()) {
+				Atom ca2 = cb.getOtherAtom(ca);
+				if (!ca2.isQueryAtom()) {
+					if (cb.getStereo() == Bond.Stereo.NONE) {
+						this.removeAtom(ca);
 					}
 				}
-
 			}
+
 		}
 		return true;
 	}
