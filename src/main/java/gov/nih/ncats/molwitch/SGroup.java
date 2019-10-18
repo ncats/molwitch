@@ -152,5 +152,6 @@ public interface SGroup {
 	Optional<String> getSubscript();
 	Optional<String> getSuperscript();
 
+	Optional<String> getSuperatomLabel();
 	boolean bracketsTrusted();
 }

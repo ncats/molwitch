@@ -49,6 +49,7 @@ class DelegateChemicalWriter implements ChemicalWriter{
 		try{
 			delegate.write(chemical.getImpl());
 		}catch(Throwable t){
+		    t.printStackTrace();
 			//sometimes the impl writer throws unchecked
 			//exceptions which slip through so catch all throwables
 			throw new IOException(t);
