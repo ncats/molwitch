@@ -150,5 +150,16 @@ public interface ChemicalImplFactory {
 	boolean supports(String format);
 	ChemicalImpl createFromSmarts(String smarts) throws IOException;
 	boolean isDefault();
-	
+
+    ChemicalImpl create(String unknownFormattedInput) throws IOException;
+
+    /**
+     * This factory can support multiple (hopefully any) format not just a particular type.
+     * Ideally this factory has it's own way of detecting the format of the chemical objects to read
+     * or the parser implementation supports multiple formats.
+     * @return
+     *
+     * @since 0.5.2
+     */
+    boolean isFormatAgnostic();
 }

@@ -47,6 +47,7 @@ public interface ChemicalSource {
 			case "sdf" : return Type.SDF;
 			case "mol" : return Type.MOL;
 			case "inchi" : return Type.INCHI;
+			case "cxsmarts":
 			case "smarts" : return Type.SMARTS;
 			}
 			if(format.startsWith("mol")) {

@@ -115,7 +115,7 @@ public final class ChemicalReaderFactory {
 	 * @see #newReader(File)
 	 */
 	public static ChemicalReader newReader(File molFile) throws IOException{
-		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory();
+		ChemicalImplFactory factory = ImplUtil.getFormatAgnosticFactory();
 		return new DefaultChemicalReader(factory.create(molFile));
 		
 	}
@@ -141,9 +141,14 @@ public final class ChemicalReaderFactory {
 		return new DefaultChemicalReader(factory.create(format, file));
 		
 	}
-	
-	
-	private static class DefaultChemicalReader implements ChemicalReader{
+    public static ChemicalImpl read(String input) throws IOException{
+        ChemicalImplFactory factory = ImplUtil.getFormatAgnosticFactory();
+        return factory.create(input);
+    }
+
+
+
+    private static class DefaultChemicalReader implements ChemicalReader{
 		private final ChemicalImplReader delegate;
 
 		private ChemicalImpl next;

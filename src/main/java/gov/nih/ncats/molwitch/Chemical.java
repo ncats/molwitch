@@ -96,17 +96,19 @@ public class Chemical {
 	}
 	
 	public static Chemical parse(String input) throws IOException{
-		//check for smarts
-		if(new BufferedReader(new StringReader(input.trim())).lines().count() == 1){
-			//only 1 line assume smarts query?
-			
-			if(input.indexOf('~') > -1 || input.indexOf('*') > -1){
-				//has wildcards
-				return Chemical.createFromSmarts(input);
-			}
-			return Chemical.createFromSmiles(input);
-		}
-		return parseMol(input);
+		ChemicalImpl impl =ChemicalReaderFactory.read(input);
+		return new Chemical(impl, impl.getSource());
+//		//check for smarts
+//		if(new BufferedReader(new StringReader(input.trim())).lines().count() == 1){
+//			//only 1 line assume smarts query?
+//
+//			if(input.indexOf('~') > -1 || input.indexOf('*') > -1){
+//				//has wildcards
+//				return Chemical.createFromSmarts(input);
+//			}
+//			return Chemical.createFromSmiles(input);
+//		}
+//		return parseMol(input);
 		
 	}
 	/**

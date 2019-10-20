@@ -65,6 +65,15 @@ public final class ImplUtil {
 	public static ChemicalImplFactory getChemicalImplFactory() {
 		return defaultFactory.get();
 	}
+
+	public static ChemicalImplFactory getFormatAgnosticFactory(){
+        for(ChemicalImplFactory factory : implLoaders.get()) {
+            if(factory.isFormatAgnostic()){
+                return factory;
+            }
+        }
+        return getChemicalImplFactory();
+    }
 	public static ChemicalImplFactory getChemicalImplFactory(String format) {
 		
 		return formatMap.computeIfAbsent(format, k->{
