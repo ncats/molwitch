@@ -1,0 +1,4 @@
+0.5.2
+
+1. Added MolSearch and MolSearchFactory to do GraphIsoMorphism searches.
+2.  Bug fixes

@@ -152,6 +152,23 @@ public class Fingerprint {
 		System.arraycopy(bitsetBytes, 0, bytes, 0, bitsetBytes.length);
 		return bytes;
 	}
+    /**
+     * Convert this fingeprint into a byte array.
+     * @return a new byte array.
+     */
+	public int[] toIntArray(){
+        int[] temp = new int[bits.size() / 32];
+
+        for (int i = 0; i < temp.length; i++) {
+            for (int j = 0; j < 32; j++) {
+                if (bits.get(i * 32 + j)) {
+                    temp[i] |= 1 << j;
+                }
+            }
+        }
+
+        return temp;
+    }
 	/**
 	 * Convert this fingerprint to a {@link BitSet}.
 	 * Please note, the returned BitSet may have different lengths
