@@ -14,7 +14,7 @@ This adds the API.
 <dependency>
   <groupId>gov.nih.ncats</groupId>
   <artifactId>molwitch</artifactId>
-  <version>0.5</version>
+  <version>0.5.2</version>
 </dependency>
 ```
 
