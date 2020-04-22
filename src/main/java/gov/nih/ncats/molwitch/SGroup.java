@@ -140,8 +140,8 @@ public interface SGroup {
 	boolean hasBrackets();
 	
 	List<SGroupBracket> getBrackets();
-	
-	public interface SGroupBracket{
+	Optional<String> getSruLabel();
+	interface SGroupBracket{
 		AtomCoordinates getPoint1();
 		AtomCoordinates getPoint2();
 		//orientation?
