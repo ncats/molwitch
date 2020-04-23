@@ -205,4 +205,8 @@ public interface Atom {
 	void setImplicitHCount(Integer implicitH);
 	
 	boolean isValidAtomicSymbol();
+
+	default boolean isMetal(){
+        return ElementData.isMetal(getAtomicNumber());
+    }
 }
