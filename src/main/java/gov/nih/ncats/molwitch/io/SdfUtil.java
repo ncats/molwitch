@@ -224,12 +224,14 @@ class SdfUtil {
                         }else if(SGROUP_CATCHALL_PATTERN.matcher(line).find()){
                             try (Scanner scanner = new Scanner(line)) {
                                 scanner.next(); //M
-                                scanner.next(); // SXX
+                                String typeCode = scanner.next(); // SXX
                                 //TODO should we check is something is valid?
 
                                 Integer sgroupNumber = scanner.nextInt();
                                 //only write out sgroups we haven't removed
-                                if(knownSgroups.containsValue(sgroupNumber)){
+                                String sgroupType = knownSgroups.get(sgroupNumber);
+                                if(sgroupType !=null && isValidSgroupLineForType(sgroupType, typeCode)){
+
                                     buffer.append(line).append("\n");
                                 }
                             }
@@ -365,6 +367,7 @@ class SdfUtil {
             }
             ;
 
+
             /**
              * Read potentially multiple lines from the reader, clean up the read lines and append
              * those cleaned lines to the given StringBuilder.
@@ -431,4 +434,13 @@ class SdfUtil {
             }
         }
     }
+
+    private static boolean isValidSgroupLineForType(String sgroupType, String typeCode){
+        if("SPA".equals(typeCode) && !("MUL".equals(sgroupType))){
+            //parent atoms only allowed for multiple groups?
+            return false;
+        }
+        return true;
+    }
+
 }
