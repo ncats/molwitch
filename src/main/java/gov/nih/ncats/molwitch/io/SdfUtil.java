@@ -230,8 +230,29 @@ class SdfUtil {
                                 Integer sgroupNumber = scanner.nextInt();
                                 //only write out sgroups we haven't removed
                                 String sgroupType = knownSgroups.get(sgroupNumber);
-                                if(sgroupType !=null && isValidSgroupLineForType(sgroupType, typeCode)){
+                                if(sgroupType ==null || !isValidSgroupLineForType(sgroupType, typeCode)){
+                                    //not valid don't write it out
+                                    continue;
+                                }else if("SAL".equals(typeCode)){
+                                    int numAtoms = scanner.nextInt();
+                                    if (numAtoms <= 8) {
+                                        //fine as is
+                                        buffer.append(line).append("\n");
+                                    } else {
+                                        //break into blocks of 8
+                                        int numLines = numAtoms / 8 + 1;
 
+                                        for (int i = 0; i < numLines; i++) {
+                                            int atomsOnLine = Math.min(8, (numAtoms - (i * 8)));
+
+                                            buffer.append("M  SAL").append(String.format(" %3d %2d", sgroupNumber, atomsOnLine));
+                                            for (int j = 0; j < atomsOnLine; j++) {
+                                                buffer.append(String.format(" %3d", scanner.nextInt()));
+                                            }
+                                            buffer.append("\n");
+                                        }
+                                    }
+                                }else{
                                     buffer.append(line).append("\n");
                                 }
                             }

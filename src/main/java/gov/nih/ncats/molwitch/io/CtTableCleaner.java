@@ -34,6 +34,7 @@ import java.io.*;
  *     <li>Remove S-Group lines that reference non-existent S-Groups</li>
  *     <li>Remove S-Group lines that reference invalid  S-Group types</li>
  *     <li>Remove S-Group parent atoms if S-Group type isn't MUL</li>
+ *     <li>break M  SAL lines with more than 8 atoms into multiple lines with at most 8 atoms per line</li>
  *     <li>break M  CHG lines with more than 8 charges into multiple lines with at most 8 charges per line</li>
  *     <li>break M  STY lines with more than 8 Sgroups into multiple lines with at most 8 S-groups per line</li>
  *     <li>Removes final newline after $$$$ in Sdfiles if any.</li>
