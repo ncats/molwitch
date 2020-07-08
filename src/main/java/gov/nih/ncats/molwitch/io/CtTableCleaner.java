@@ -18,6 +18,9 @@
 
 package gov.nih.ncats.molwitch.io;
 
+import gov.nih.ncats.common.io.InputStreamSupplier;
+import gov.nih.ncats.common.iter.CloseableIterator;
+
 import java.io.*;
 
 /**
@@ -56,5 +59,14 @@ public final class CtTableCleaner {
             SdfUtil.copyClean(reader, writer);
         }
         return out.toString();
+    }
+    public static CloseableIterator<String> clean(File molOrSdFile) throws IOException{
+        return clean(InputStreamSupplier.forFile(molOrSdFile).get());
+
+    }
+    public static CloseableIterator<String> clean(InputStream molOrSdInputStream) throws IOException{
+
+        return new SdfUtil.CleanSdfIterator(new BufferedReader(new InputStreamReader(molOrSdInputStream)));
+
     }
 }
