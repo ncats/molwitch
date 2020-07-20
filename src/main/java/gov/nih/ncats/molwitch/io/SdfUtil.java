@@ -434,19 +434,24 @@ class SdfUtil {
         }
         private String readNextRecord() throws IOException {
             buffer.setLength(0); //clear old state
-            while(currentReadState != ReadState.EOF){
-                currentReadState= currentReadState.readClean(reader, buffer);
-                //we check delimiter here because if we put it up in the while loop
-                //with the EOF check then when  on the 2nd call to next() we never enter the while loop!
-                if(currentReadState == ReadState.DELIMITER){
-                    break;
+            try {
+                while (currentReadState != ReadState.EOF) {
+                    currentReadState = currentReadState.readClean(reader, buffer);
+                    //we check delimiter here because if we put it up in the while loop
+                    //with the EOF check then when  on the 2nd call to next() we never enter the while loop!
+                    if (currentReadState == ReadState.DELIMITER) {
+                        break;
+                    }
                 }
-            }
 
-            if(buffer.length() >0) {
-                return buffer.toString();
+                if (buffer.length() > 0) {
+                    return buffer.toString();
+                }
+                return null;
+            }catch(Exception e){
+                //usually a runtime exception from scanner
+                throw new IOException("error parsing ctfile",e);
             }
-            return null;
         }
         @Override
         public boolean hasNext(){
