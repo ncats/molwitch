@@ -225,6 +225,38 @@ class SdfUtil {
                             try (Scanner scanner = new Scanner(line)) {
                                 scanner.next(); //M
                                 String typeCode = scanner.next(); // SXX
+                                //GSRS-1596
+                                //not all S group lines have a group number
+                                if("SDS".equals(typeCode)){
+                                    //format is M SDS EXPn15
+                                    String expansion = scanner.next("[A-Z]+");
+                                    if("EXP".equals(expansion)){
+                                        int count =scanner.nextInt();
+                                        if(count <=15) {
+                                            buffer.append(String.format("M  SDS EXP%3d", count));
+                                            for (int i = 0; i < count; i++) {
+                                                buffer.append(String.format(" %3d", scanner.nextInt()));
+                                            }
+                                            buffer.append("\n");
+                                        }else{
+                                            int numLeft = count;
+                                            do{
+                                                int currentLine = Math.min(15, numLeft);
+                                                buffer.append(String.format("M  SDS EXP%3d", currentLine));
+                                                for (int i = 0; i < currentLine; i++) {
+                                                    buffer.append(String.format(" %3d", scanner.nextInt()));
+                                                }
+                                                buffer.append("\n");
+                                                numLeft -=15;
+                                            }while(numLeft>0);
+                                        }
+                                        continue;
+                                    }
+                                    //if we are here it's an SDS line that's not an EXP ?
+                                    //write out as is ?
+                                    buffer.append(line).append("\n");
+                                    continue;
+                                }
                                 //TODO should we check is something is valid?
 
                                 Integer sgroupNumber = scanner.nextInt();

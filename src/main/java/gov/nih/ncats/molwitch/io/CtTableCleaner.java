@@ -40,6 +40,7 @@ import java.io.*;
  *     <li>break M  SAL lines with more than 8 atoms into multiple lines with at most 8 atoms per line</li>
  *     <li>break M  CHG lines with more than 8 charges into multiple lines with at most 8 charges per line</li>
  *     <li>break M  STY lines with more than 8 Sgroups into multiple lines with at most 8 S-groups per line</li>
+ *     <li>break S-Group EXP lines with more than 15 into multiple lines with at most 15 per line</li>
  *     <li>Removes final newline after $$$$ in Sdfiles if any.</li>
  *     <li>the M  END line is forced to have 2 spaces between M and END.</li>
  *     <li>ignore anything after the M  END line start, as it sometimes is added by accident in a few tools</li>
