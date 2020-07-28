@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 class SdfUtil {
 
@@ -148,6 +149,8 @@ class SdfUtil {
                 public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException {
 
                     Map<Integer, String> knownSgroups = new TreeMap<>();
+                    Map<Integer, String> sgroupLabels = new TreeMap<>();
+
                     Set<Integer> removedSgroups = new HashSet<>();
                     String line;
                     while( (line = reader.readLine()) !=null){
@@ -179,7 +182,9 @@ class SdfUtil {
                             try (Scanner scanner = new Scanner(line)) {
                                 scanner.next(); //M
                                 scanner.next(); // STY
-
+                                //we could have multiple STY lines we don't want to duplicate records
+                                //so only write out the cleaned up ones defined in this line
+                                Set<Integer> groupsDefinedInThisLine = new LinkedHashSet<>();
                                 int numberOfRecords = scanner.nextInt();
                                 if (numberOfRecords > 8) {
                                     //need to split this into lines of 8
@@ -195,25 +200,28 @@ class SdfUtil {
                                     }
                                     //when we are here we have a valid group
                                     String oldSgroup = knownSgroups.put(num, sgroupType);
+                                    groupsDefinedInThisLine.add(num);
                                     if (oldSgroup != null) {
                                         //we have a duplicate s-group number!
                                         //TODO how do we handle that? error out? overwrite?
                                     }
                                 }
-                                if(knownSgroups.size() <=8) {
-                                    buffer.append("M  STY  " + knownSgroups.size());
-                                    for (Map.Entry<Integer, String> entry : knownSgroups.entrySet()) {
-                                        buffer.append(String.format(" %3s %3s", entry.getKey(), entry.getValue()));
+                                if(groupsDefinedInThisLine.size() <=8) {
+                                    buffer.append("M  STY  " + groupsDefinedInThisLine.size());
+                                    for (Integer num : groupsDefinedInThisLine) {
+                                        String type = knownSgroups.get(num);
+                                        buffer.append(String.format(" %3s %3s", num, type));
                                     }
                                     buffer.append("\n");
                                 }else{
-                                    int numLeft = knownSgroups.size();
+                                    int numLeft = groupsDefinedInThisLine.size();
                                     do {
                                         buffer.append("M  STY  " + Math.min(numLeft, 8));
-                                        Iterator<Map.Entry<Integer, String>> iter = knownSgroups.entrySet().iterator();
+                                        Iterator<Integer> iter = groupsDefinedInThisLine.iterator();
                                         for (int i = 0; i < 8 && iter.hasNext(); i++) {
-                                            Map.Entry<Integer, String> entry = iter.next();
-                                            buffer.append(String.format(" %3s %3s", entry.getKey(), entry.getValue()));
+                                            Integer num = iter.next();
+                                            String type = knownSgroups.get(num);
+                                            buffer.append(String.format(" %3s %3s", num, type));
                                         }
                                         buffer.append("\n");
                                         numLeft -= 8;
@@ -284,11 +292,41 @@ class SdfUtil {
                                             buffer.append("\n");
                                         }
                                     }
+                                }else if ("SMT".equals(typeCode)){
+
+
+                                    if(sgroupLabels.containsKey(sgroupNumber)){
+                                        //already labelled
+                                        //remove line?
+                                        continue;
+                                    }
+                                    String label = scanner.next();
+                                    sgroupLabels.put(sgroupNumber, label);
+
+                                    //if we're here line is good
+                                    buffer.append(line).append("\n");
                                 }else{
                                     buffer.append(line).append("\n");
                                 }
                             }
                         } else if(END_PATTERN.matcher(line).find()){
+                            //check for missing SRU labels
+                            Set<Integer> missingSruIndexes = knownSgroups.entrySet().stream()
+                                                .filter(e-> "SRU".equals(e.getValue()))
+                                                .filter(e-> !sgroupLabels.containsKey(e.getKey()))
+                                                .map(Map.Entry::getKey)
+                                                .collect(Collectors.toSet());
+                            if(!missingSruIndexes.isEmpty()){
+                               Map<Integer, String>  sruLabels = knownSgroups.entrySet().stream()
+                                                                   .filter(e-> "SRU".equals(e.getValue()) && sgroupLabels.containsKey(e.getKey()))
+                                                                   .collect(Collectors.toMap(Map.Entry::getKey, e-> sgroupLabels.get(e.getKey())));
+
+                               Map<Integer, String> newLabels = new MissingSruLabelGenerator(sruLabels).generateFor(missingSruIndexes);
+                                for(Map.Entry<Integer, String> entry : newLabels.entrySet()){
+                                    buffer.append(String.format("M  SMT %3d %s\n", entry.getKey(), entry.getValue()));
+                                }
+
+                            }
                             buffer.append("M  END"); //NOTE 2 spaces
                             if(reader.peekLine() !=null){
                                 buffer.append("\n");
@@ -501,4 +539,30 @@ class SdfUtil {
         return true;
     }
 
+
+    private static class MissingSruLabelGenerator{
+        private final Map<Integer, String> knownSgroups;
+        private final Set<String> knownLabels;
+        public MissingSruLabelGenerator(Map<Integer, String> knownSgroups) {
+            this.knownSgroups = knownSgroups;
+            knownLabels = new HashSet<>(knownSgroups.values());
+        }
+
+        public Map<Integer, String> generateFor(Set<Integer> missingSruIndexes){
+            char currentLabel= 'A';
+            Map<Integer, String> newLabelMap = new LinkedHashMap<>( 2* missingSruIndexes.size());
+            for(Integer i : missingSruIndexes){
+                String asStr = Character.toString(currentLabel);
+                while(knownLabels.contains(asStr)){
+                    currentLabel++;
+                    asStr = Character.toString(currentLabel);
+                    //TODO handle more than Z ?
+
+                }
+                newLabelMap.put(i, asStr);
+                knownLabels.add(asStr);
+            }
+            return newLabelMap;
+        }
+    }
 }
