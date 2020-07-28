@@ -24,7 +24,7 @@
 
     <groupId>gov.nih.ncats</groupId>
     <artifactId>molwitch</artifactId>
-    <version>0.5.6</version>
+    <version>0.5.7</version>
 
     <name>ncats-molwitch</name>
 

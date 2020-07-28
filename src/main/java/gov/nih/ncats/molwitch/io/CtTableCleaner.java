@@ -20,8 +20,10 @@ package gov.nih.ncats.molwitch.io;
 
 import gov.nih.ncats.common.io.InputStreamSupplier;
 import gov.nih.ncats.common.iter.CloseableIterator;
+import gov.nih.ncats.molwitch.SGroup;
 
 import java.io.*;
+import java.util.Map;
 
 /**
  * Utility class to fix or "clean up" v2000 mol and sdfile formatted
@@ -51,6 +53,7 @@ public final class CtTableCleaner {
     private CtTableCleaner(){
         //can not instantiate
     }
+
 
     public static String clean(String molOrSdText) throws IOException{
         StringWriter out = new StringWriter(molOrSdText.length());

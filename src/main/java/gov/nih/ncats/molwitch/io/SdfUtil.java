@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 class SdfUtil {
 
@@ -148,6 +149,8 @@ class SdfUtil {
                 public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException {
 
                     Map<Integer, String> knownSgroups = new TreeMap<>();
+                    Map<Integer, String> sgroupLabels = new TreeMap<>();
+
                     Set<Integer> removedSgroups = new HashSet<>();
                     String line;
                     while( (line = reader.readLine()) !=null){
@@ -179,7 +182,9 @@ class SdfUtil {
                             try (Scanner scanner = new Scanner(line)) {
                                 scanner.next(); //M
                                 scanner.next(); // STY
-
+                                //we could have multiple STY lines we don't want to duplicate records
+                                //so only write out the cleaned up ones defined in this line
+                                Set<Integer> groupsDefinedInThisLine = new LinkedHashSet<>();
                                 int numberOfRecords = scanner.nextInt();
                                 if (numberOfRecords > 8) {
                                     //need to split this into lines of 8
@@ -195,25 +200,28 @@ class SdfUtil {
                                     }
                                     //when we are here we have a valid group
                                     String oldSgroup = knownSgroups.put(num, sgroupType);
+                                    groupsDefinedInThisLine.add(num);
                                     if (oldSgroup != null) {
                                         //we have a duplicate s-group number!
                                         //TODO how do we handle that? error out? overwrite?
                                     }
                                 }
-                                if(knownSgroups.size() <=8) {
-                                    buffer.append("M  STY  " + knownSgroups.size());
-                                    for (Map.Entry<Integer, String> entry : knownSgroups.entrySet()) {
-                                        buffer.append(String.format(" %3s %3s", entry.getKey(), entry.getValue()));
+                                if(groupsDefinedInThisLine.size() <=8) {
+                                    buffer.append("M  STY  " + groupsDefinedInThisLine.size());
+                                    for (Integer num : groupsDefinedInThisLine) {
+                                        String type = knownSgroups.get(num);
+                                        buffer.append(String.format(" %3s %3s", num, type));
                                     }
                                     buffer.append("\n");
                                 }else{
-                                    int numLeft = knownSgroups.size();
+                                    int numLeft = groupsDefinedInThisLine.size();
                                     do {
                                         buffer.append("M  STY  " + Math.min(numLeft, 8));
-                                        Iterator<Map.Entry<Integer, String>> iter = knownSgroups.entrySet().iterator();
+                                        Iterator<Integer> iter = groupsDefinedInThisLine.iterator();
                                         for (int i = 0; i < 8 && iter.hasNext(); i++) {
-                                            Map.Entry<Integer, String> entry = iter.next();
-                                            buffer.append(String.format(" %3s %3s", entry.getKey(), entry.getValue()));
+                                            Integer num = iter.next();
+                                            String type = knownSgroups.get(num);
+                                            buffer.append(String.format(" %3s %3s", num, type));
                                         }
                                         buffer.append("\n");
                                         numLeft -= 8;
