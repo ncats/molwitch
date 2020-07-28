@@ -215,9 +215,10 @@ class SdfUtil {
                                     buffer.append("\n");
                                 }else{
                                     int numLeft = groupsDefinedInThisLine.size();
+                                    Iterator<Integer> iter = groupsDefinedInThisLine.iterator();
                                     do {
                                         buffer.append("M  STY  " + Math.min(numLeft, 8));
-                                        Iterator<Integer> iter = groupsDefinedInThisLine.iterator();
+
                                         for (int i = 0; i < 8 && iter.hasNext(); i++) {
                                             Integer num = iter.next();
                                             String type = knownSgroups.get(num);
