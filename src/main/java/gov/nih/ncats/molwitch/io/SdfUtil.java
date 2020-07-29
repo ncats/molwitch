@@ -150,33 +150,38 @@ class SdfUtil {
 
                     Map<Integer, String> knownSgroups = new TreeMap<>();
                     Map<Integer, String> sgroupLabels = new TreeMap<>();
+                    Map<Integer, DataBuilder> dataBuilders = new TreeMap<>();
 
                     Set<Integer> removedSgroups = new HashSet<>();
+                    DataBuilder currentDataBuilder=null;
                     String line;
                     while( (line = reader.readLine()) !=null){
-
+                        if(currentDataBuilder !=null && !line.startsWith("M  SCD") && !line.startsWith("M  SED")){
+                            //incorrectly formatted DATA group block..
+                            //supposed to be consecutive SCD(s) followed by SED line
+                            //just write out what we have
+                            buffer.append(currentDataBuilder.format());
+                            currentDataBuilder = null;
+                        }
                         if(line.startsWith("M  CHG")) {
                             try (Scanner scanner = new Scanner(line)) {
                                 scanner.next(); //M
                                 scanner.next(); // CHG
                                 int numCharges = scanner.nextInt();
-                                if (numCharges <= 8) {
-                                    //fine as is
-                                    buffer.append(line).append("\n");
-                                } else {
-                                    //break into blocks of 8
-                                    int numLines = numCharges / 8 + 1;
 
-                                    for (int i = 0; i < numLines; i++) {
-                                        int chargesOnLine = Math.min(8, (numCharges - (i * 8)));
+                                //break into blocks of 8
+                                while(numCharges>0) {
 
-                                        buffer.append("M  CHG").append(String.format("%3s", chargesOnLine));
-                                        for (int j = 0; j < chargesOnLine; j++) {
-                                            buffer.append(String.format(" %3s %3s", scanner.next(), scanner.next()));
-                                        }
-                                        buffer.append("\n");
+                                    int chargesOnLine = Math.min(8, numCharges);
+
+                                    buffer.append("M  CHG").append(String.format(" %3s", chargesOnLine));
+                                    for (int j = 0; j < chargesOnLine; j++) {
+                                        buffer.append(String.format(" %3s %3s", scanner.next(), scanner.next()));
                                     }
+                                    buffer.append("\n");
+                                    numCharges-=8;
                                 }
+
                             }
                         }else if(SGROUP_DEF_PATTERN.matcher(line).find()) {
                             try (Scanner scanner = new Scanner(line)) {
@@ -199,15 +204,18 @@ class SdfUtil {
                                         continue;
                                     }
                                     //when we are here we have a valid group
-                                    String oldSgroup = knownSgroups.put(num, sgroupType);
-                                    groupsDefinedInThisLine.add(num);
-                                    if (oldSgroup != null) {
+                                    if(knownSgroups.containsKey(num)){
                                         //we have a duplicate s-group number!
                                         //TODO how do we handle that? error out? overwrite?
+                                        //for now just assume it's an error and do not redeclare it
+                                    }else{
+                                        knownSgroups.put(num, sgroupType);
+                                        groupsDefinedInThisLine.add(num);
                                     }
+
                                 }
                                 if(groupsDefinedInThisLine.size() <=8) {
-                                    buffer.append("M  STY  " + groupsDefinedInThisLine.size());
+                                    buffer.append("M  STY   " + groupsDefinedInThisLine.size());
                                     for (Integer num : groupsDefinedInThisLine) {
                                         String type = knownSgroups.get(num);
                                         buffer.append(String.format(" %3s %3s", num, type));
@@ -276,15 +284,15 @@ class SdfUtil {
                                     continue;
                                 }else if("SAL".equals(typeCode)){
                                     int numAtoms = scanner.nextInt();
-                                    if (numAtoms <= 8) {
+                                    if (numAtoms <= 15) {
                                         //fine as is
                                         buffer.append(line).append("\n");
                                     } else {
-                                        //break into blocks of 8
-                                        int numLines = numAtoms / 8 + 1;
+                                        //break into blocks of 15
+                                        int numLines = numAtoms / 15 + 1;
 
                                         for (int i = 0; i < numLines; i++) {
-                                            int atomsOnLine = Math.min(8, (numAtoms - (i * 8)));
+                                            int atomsOnLine = Math.min(15, (numAtoms - (i * 15)));
 
                                             buffer.append("M  SAL").append(String.format(" %3d %2d", sgroupNumber, atomsOnLine));
                                             for (int j = 0; j < atomsOnLine; j++) {
@@ -293,11 +301,45 @@ class SdfUtil {
                                             buffer.append("\n");
                                         }
                                     }
+                                }else if("SED".equals(typeCode)){
+                                    if(currentDataBuilder ==null){
+                                        currentDataBuilder =  new DataBuilder(sgroupNumber);
+                                    }else{
+                                        //already have a current data builder
+                                        if(sgroupNumber.intValue() != currentDataBuilder.sgroupNum){
+                                            //a different group !?
+                                            //write old one out
+                                            buffer.append(currentDataBuilder.format());
+                                            //now make new one...
+                                            currentDataBuilder =  new DataBuilder(sgroupNumber);
+                                        }
+                                    }
+
+                                    currentDataBuilder.handleSED(scanner.nextLine());
+                                    buffer.append(currentDataBuilder.format());
+                                    currentDataBuilder=null;
+
+
+                                }else if("SCD".equals(typeCode)){
+                                    if(currentDataBuilder ==null){
+                                        currentDataBuilder =  new DataBuilder(sgroupNumber);
+                                    }else{
+                                        //already have a current data builder
+                                        if(sgroupNumber.intValue() != currentDataBuilder.sgroupNum){
+                                            //a different group !?
+                                            //write old one out
+                                            buffer.append(currentDataBuilder.format());
+                                            //now make new one...
+                                            currentDataBuilder =  new DataBuilder(sgroupNumber);
+                                        }
+                                    }
+                                    currentDataBuilder.handleSCD(scanner.nextLine());
                                 }else{
                                     buffer.append(line).append("\n");
                                 }
                             }
                         } else if(END_PATTERN.matcher(line).find()){
+
                             buffer.append("M  END"); //NOTE 2 spaces
                             if(reader.peekLine() !=null){
                                 buffer.append("\n");
@@ -508,6 +550,50 @@ class SdfUtil {
             return false;
         }
         return true;
+    }
+
+    private static final class DataBuilder{
+        private boolean seenSED=false;
+        private StringBuilder builder = new StringBuilder(200);
+        private final int sgroupNum;
+
+        public DataBuilder(int sgroupNum){
+            this.sgroupNum=sgroupNum;
+        }
+        public void handleSED(String text){
+            handleSCD(text);
+            seenSED=true;
+        }
+        public void handleSCD(String text){
+            if(seenSED){
+                //TODO already seen SED!!
+                //do nothing I guess
+                return;
+            }
+            if(Character.isWhitespace(text.charAt(0))){
+                builder.append(text.substring(1));
+            }else{
+                builder.append(text);
+            }
+        }
+
+        public String format(){
+            //right trim but not left
+            String rightTrimmed = builder.toString().replaceAll("\\s+$","");
+            if(rightTrimmed.length()<=69){
+                //only one line
+                return String.format("M  SED %3d %s\n",sgroupNum, rightTrimmed);
+            }
+            StringBuilder builder = new StringBuilder(200);
+            do {
+
+                builder.append(String.format("M  SCD %3d %s\n", sgroupNum, rightTrimmed.substring(0, 70)));
+                rightTrimmed = rightTrimmed.substring(70);
+            }while(rightTrimmed.length()>70);
+             builder.append(String.format("M  SED %3d %s\n",sgroupNum, rightTrimmed));
+             return builder.toString();
+        }
+
     }
 
 }
