@@ -215,7 +215,7 @@ class SdfUtil {
 
                                 }
                                 if(groupsDefinedInThisLine.size() <=8) {
-                                    buffer.append("M  STY   " + groupsDefinedInThisLine.size());
+                                    buffer.append("M  STY  " + groupsDefinedInThisLine.size());
                                     for (Integer num : groupsDefinedInThisLine) {
                                         String type = knownSgroups.get(num);
                                         buffer.append(String.format(" %3s %3s", num, type));

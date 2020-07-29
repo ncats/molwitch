@@ -1,3 +1,6 @@
+0.5.9
+* fixed spacing in CTFileCleaner STY lines which broke JSdraw
+
 0.5.8
 1. CTFileCleaner enhancements to add clean up for DAT Sgroups
 
