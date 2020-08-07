@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 public interface SGroup {
 
-	public enum SGroupConnectivity{
+    enum SGroupConnectivity{
 		HEAD_TO_HEAD("HH"),
 		HEAD_TO_TAIL("HT"),
 		EITHER_UNKNOWN("EU")
@@ -38,7 +38,7 @@ public interface SGroup {
 			}
 		}
 		private final String type;
-		private SGroupConnectivity(String type) {
+		SGroupConnectivity(String type) {
 			this.type = type;
 		}
 		
@@ -47,7 +47,7 @@ public interface SGroup {
 		}
 	}
 	
-	public enum PolymerSubType{
+	enum PolymerSubType{
 		//ALT = alternating, RAN = random, BLO = block
 		ALTERNATING("ALT"),
 		RANDOM("RAN"),
