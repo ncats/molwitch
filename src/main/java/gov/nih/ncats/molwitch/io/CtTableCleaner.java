@@ -35,6 +35,9 @@ import java.util.Map;
  * <ul>
  *     <li>Correcting header if it has too few lines</li>
  *     <li>fix additional whitespace in leading or trailing records</li>
+ *     <li>fix incorrect leading whitespace in Atom Block</li>
+ *     <li>fix incorrect leading whitespace in Bond List</li>
+ *     <li>Correctly format the Counts Header Line</li>
  *     <li>remove additional whitespace between M  END block and the property block</li>
  *     <li>Remove S-Group lines that reference non-existent S-Groups</li>
  *     <li>Remove S-Group lines that reference invalid  S-Group types</li>

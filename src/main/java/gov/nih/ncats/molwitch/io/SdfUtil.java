@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 class SdfUtil {
 
@@ -43,6 +42,8 @@ class SdfUtil {
         private StringBuilder buffer = new StringBuilder(10_240);
         private String currentRecord;
 
+        private static final Pattern ATOM_SYMBOL_PATTERN = Pattern.compile(".{3}");
+
         private ReadState currentReadState = ReadState.BEGIN;
         public CleanSdfIterator(BufferedReader reader) throws IOException{
             this.reader = new PushbackBufferedReader(reader);
@@ -54,7 +55,7 @@ class SdfUtil {
 
             BEGIN{
                 @Override
-                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException {
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException {
                     return reader.peekLine() ==null? EOF : HEADER;
                 }
             },
@@ -66,7 +67,7 @@ class SdfUtil {
              */
             HEADER{
                 @Override
-                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException{
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException{
                     List<String> header = new ArrayList<>(4);
 
                     for(int i=0; i<4; i++){
@@ -120,11 +121,106 @@ class SdfUtil {
                     if(!valid){
                         throw new IOException("invalid mol header early EOF : " + header);
                     }
-                    for(String l : header){
-                        buffer.append(l).append("\n");
+                    //we will process the counts line next so don't write it out
+                    //but if we get here we should have a header of 4 lines
+                    //so only write out the first 3
+                    for(int i=0; i<header.size()-1; i++){
+                        buffer.append(header.get(i)).append("\n");
+                    }
+                    String lastLine = header.get(header.size() - 1);
+                    if(lastLine.endsWith("V2000")) {
+                        //unread counts line
+                        reader.pushBack(header.get(3));
+                    }else{
+                        buffer.append(lastLine).append("\n");
                     }
 
                     //we're done reading the header
+                    return COUNTS_LINE;
+                }
+            },
+            COUNTS_LINE{
+                @Override
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException {
+                    String line = reader.readLine();
+//                    System.out.println(line);
+                    //aaabbblllfffcccsssxxxrrrpppiiimmmvvvvvv
+                    int numAtoms = Integer.parseInt(line.substring(0,3).trim());
+                    int numBonds = Integer.parseInt(line.substring(3,6).trim());
+                    int atomLists = Integer.parseInt(line.substring(6,9).trim());
+
+                    int chiral = Integer.parseInt(line.substring(12,15).trim());
+                    int stexts = Integer.parseInt(line.substring(15,18).trim());
+                    //TODO for consistency keep the ignored part the same maybe make that configurable?
+                    String ignoredPart = line.substring(18,30);
+                    int numAdditionalProperties = Integer.parseInt(line.substring(30,33).trim());
+                    //ignore the rest
+
+                    buffer.append(String.format("%3d%3d%3d%3d%3d%3d%s%3d V2000\n", numAtoms, numBonds, atomLists, 0,chiral, stexts, ignoredPart, numAdditionalProperties));
+                    properties.put(PARSE_PROPERTIES.EXPECTED_NUM_ATOMS, numAtoms);
+                    properties.put(PARSE_PROPERTIES.EXPECTED_NUM_BONDS, numBonds);
+                    return ATOM_LIST;
+                }
+            },
+            ATOM_LIST{
+                @Override
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException {
+                    int numAtoms = (Integer) properties.get(PARSE_PROPERTIES.EXPECTED_NUM_ATOMS);
+                    int numBonds = (Integer) properties.get(PARSE_PROPERTIES.EXPECTED_NUM_BONDS);
+                    for(int i=0; i< numAtoms; i++){
+                        String line = reader.readLine();
+                        //for now assume the line is formatted correctly
+                        //except possibly leading whitespace
+                        //due to copy and paste mistakes or weird formatting from editors
+                        int indexofFirstDecimal = line.indexOf('.');
+                        String xCoordinateIntPart = line.substring(0, indexofFirstDecimal).trim();
+
+                        buffer.append(String.format("%5s", xCoordinateIntPart)).append(line.substring(indexofFirstDecimal)).append("\n");
+                    }
+                    return BOND_LIST;
+                }
+            },
+            BOND_LIST{
+                @Override
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException {
+                    int numAtoms = (Integer) properties.get(PARSE_PROPERTIES.EXPECTED_NUM_ATOMS);
+                    int numBonds = (Integer) properties.get(PARSE_PROPERTIES.EXPECTED_NUM_BONDS);
+
+                    for(int i=0; i< numBonds; i++){
+                        String line = reader.readLine();
+                        //for now assume the line is formatted correctly
+                        //except possibly leading whitespace
+                        //due to copy and paste mistakes or weird formatting from editors
+                        char[] asChars = line.toCharArray();
+                        int j=0;
+                        while(asChars[j] <= ' '){
+                            j++;
+                        }
+                        String leftTrimmed = new String(asChars, j, asChars.length-j);
+                        try(Scanner scanner = new Scanner(leftTrimmed)){
+                            int index = scanner.nextInt();
+                            if(index < 10){
+                                buffer.append("  ").append(leftTrimmed).append("\n");
+                            }else if(index < 100){
+                                buffer.append(" ").append(leftTrimmed).append("\n");
+                            }else if(index < 1000){
+                                //3 digit first atom index 2 or less digit 2nd index
+                                buffer.append(leftTrimmed).append("\n");
+                            }else if(index <10_000){
+                                    //4 digits = abbb
+                                    buffer.append("  ").append(leftTrimmed).append("\n");
+                            }else if(index < 100_000){
+                                //5 digits = aabbb
+                                buffer.append(" ").append(leftTrimmed).append("\n");
+                            }else{
+                                //6 digits aaabbb
+                                buffer.append(leftTrimmed).append("\n");
+                            }
+
+
+                        }
+
+                    }
                     return CONNECTION_TABLE;
                 }
             },
@@ -146,7 +242,7 @@ class SdfUtil {
 
 
                 @Override
-                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException {
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException {
 
                     Map<Integer, String> knownSgroups = new TreeMap<>();
                     Map<Integer, String> sgroupLabels = new TreeMap<>();
@@ -174,7 +270,7 @@ class SdfUtil {
 
                                     int chargesOnLine = Math.min(8, numCharges);
 
-                                    buffer.append("M  CHG").append(String.format(" %3s", chargesOnLine));
+                                    buffer.append("M  CHG").append(String.format("%3s", chargesOnLine));
                                     for (int j = 0; j < chargesOnLine; j++) {
                                         buffer.append(String.format(" %3s %3s", scanner.next(), scanner.next()));
                                     }
@@ -363,7 +459,7 @@ class SdfUtil {
              */
             BEFORE_DATA_ITEMS{
                 @Override
-                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException {
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException {
 
                     String line;
                     while( (line = reader.readLine()) !=null){
@@ -393,7 +489,7 @@ class SdfUtil {
              */
             DATA_ITEMS{
                 @Override
-                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException {
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException {
 
                     String line;
                     while( (line = reader.readLine()) !=null ){
@@ -422,7 +518,7 @@ class SdfUtil {
              */
             DELIMITER {
                 @Override
-                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException {
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException {
                     //We've already read the $$$$ part
                     //so just remove extra blank lines until the next record
                     String line;
@@ -463,7 +559,7 @@ class SdfUtil {
             },
             EOF{
                 @Override
-                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException {
+                public ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException {
                     //infinite Loop?
 
                     return EOF;
@@ -477,17 +573,19 @@ class SdfUtil {
              * those cleaned lines to the given StringBuilder.
              * @param reader the {@link PushbackBufferedReader} to read from.
              * @param buffer the StringBuilder to write to.
+             * @param properties any properties that need to be set in one readState and used in a later state
              * @return the next {@link ReadState} based on the lines read from the reader.
              * @throws IOException if there are any problems reading the lines or parsing the data that was read.
              */
-            public abstract ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer) throws IOException;
+            public abstract ReadState readClean(PushbackBufferedReader reader, StringBuilder buffer, Map<PARSE_PROPERTIES, Object> properties) throws IOException;
 
         }
         private String readNextRecord() throws IOException {
             buffer.setLength(0); //clear old state
+            Map<PARSE_PROPERTIES, Object> properties = new EnumMap<>(PARSE_PROPERTIES.class);
             try {
                 while (currentReadState != ReadState.EOF) {
-                    currentReadState = currentReadState.readClean(reader, buffer);
+                    currentReadState = currentReadState.readClean(reader, buffer, properties);
                     //we check delimiter here because if we put it up in the while loop
                     //with the EOF check then when  on the 2nd call to next() we never enter the while loop!
                     if (currentReadState == ReadState.DELIMITER) {
@@ -530,6 +628,10 @@ class SdfUtil {
         }
     }
 
+    private enum PARSE_PROPERTIES{
+        EXPECTED_NUM_ATOMS,
+        EXPECTED_NUM_BONDS;
+    }
     /**
      * Will close the inputReader but not the outputWriter inase multiple files should be written to same writer.
      * @param inputReader
