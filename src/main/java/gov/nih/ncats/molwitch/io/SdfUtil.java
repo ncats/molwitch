@@ -174,7 +174,7 @@ class SdfUtil {
 
                                     int chargesOnLine = Math.min(8, numCharges);
 
-                                    buffer.append("M  CHG").append(String.format(" %3s", chargesOnLine));
+                                    buffer.append("M  CHG").append(String.format("%3s", chargesOnLine));
                                     for (int j = 0; j < chargesOnLine; j++) {
                                         buffer.append(String.format(" %3s %3s", scanner.next(), scanner.next()));
                                     }
