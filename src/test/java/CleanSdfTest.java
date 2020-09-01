@@ -1081,8 +1081,8 @@ public class CleanSdfTest {
                 "  8  9  1  0  0  0  0\n" +
                 "  9 10  1  0  0  0  0\n" +
                 " 10  5  1  0  0  0  0\n" +
-                "M  CHG   8   1   1   2   1   3   1   4   1   5   1   6   1   7   1   8   1\n" +
-                "M  CHG   2   9   1  10   1\n" +
+                "M  CHG  8   1   1   2   1   3   1   4   1   5   1   6   1   7   1   8   1\n" +
+                "M  CHG  2   9   1  10   1\n" +
                 "M  END";
         assertCleanedCorrectly(expected, molfileWithTooManyChargesOnOneLine);
 
@@ -1243,11 +1243,11 @@ public class CleanSdfTest {
                 " 33 34  1  0  0  0  0\n" +
                 " 34 35  1  0  0  0  0\n" +
                 " 35 36  1  0  0  0  0\n" +
-                "M  CHG   8   1   1   2   1   3   1   4   1   5   1   6   1   7   1   8   1\n" +
-                "M  CHG   8   9   1  10   1  11   1  12   1  13   1  14   1  15   1  16   1\n" +
-                "M  CHG   8  17   1  18   1  19   1  20   1  21   1  22   1  23   1  24   1\n" +
-                "M  CHG   8  25   1  26   1  27   1  28   1  29   1  30   1  31   1  32   1\n" +
-                "M  CHG   4  33   1  34   1  35   1  36   1\n" +
+                "M  CHG  8   1   1   2   1   3   1   4   1   5   1   6   1   7   1   8   1\n" +
+                "M  CHG  8   9   1  10   1  11   1  12   1  13   1  14   1  15   1  16   1\n" +
+                "M  CHG  8  17   1  18   1  19   1  20   1  21   1  22   1  23   1  24   1\n" +
+                "M  CHG  8  25   1  26   1  27   1  28   1  29   1  30   1  31   1  32   1\n" +
+                "M  CHG  4  33   1  34   1  35   1  36   1\n" +
                 "M  END";
 
 
@@ -1735,7 +1735,7 @@ public class CleanSdfTest {
 //                "M  SPA   1  1  18\n" +
                 "M  SDI   1  4   25.1727  -16.0952   25.1727  -12.8501\n" +
                 "M  SDI   1  4   38.7614  -12.8501   38.7614  -16.0952\n" +
-                "M  CHG   1  11  -1\n" +
+                "M  CHG  1  11  -1\n" +
                 "M  END";
 
         assertCleanedCorrectly(expected,mol);
@@ -4081,8 +4081,8 @@ public class CleanSdfTest {
                     "  8  9  1  0  0  0  0\n" +
                     "  9 10  1  0  0  0  0\n" +
                     " 10  5  1  0  0  0  0\n" +
-                    "M  CHG   8   1   1   2   1   3   1   4   1   5   1   6   1   7   1   8   1\n" +
-                    "M  CHG   2   9   1  10   1\n" +
+                    "M  CHG  8   1   1   2   1   3   1   4   1   5   1   6   1   7   1   8   1\n" +
+                    "M  CHG  2   9   1  10   1\n" +
                     "M  STY  1   1 DAT\n" +
                     "M  SDT   1 FDAREG_SGROUP                                         \n" +
                     "M  SDD   1    38.4267  -14.6640    DA    ALL  1       5  \n" +
