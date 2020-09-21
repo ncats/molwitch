@@ -704,7 +704,7 @@ public class Chemical {
 			atomsToCheck = atomsToCheck.filter(a-> !ignoreSet.contains(a));
 		}
 
-		for (Atom ca : atomsToCheck.filter(a-> a.getSymbol().equals("H"))
+		for (Atom ca : atomsToCheck.filter(a-> "H".equals(a.getSymbol()))
 				.filter(h -> h.getMassNumber() ==0 && h.getRadical() == 0
 						&& h.getChirality().getParity() == 0 && h.getCharge() == 0
 						&& !h.getAtomToAtomMap().isPresent())
