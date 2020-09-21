@@ -74,7 +74,7 @@ public class Chemical {
 	 * @throws IOException if there is a problem parsing the mol record.
 	 */
 	public static Chemical parseMol(byte[] bytes, int start, int length) throws IOException {
-		try(ChemicalReader reader = ChemicalReaderFactory.newReader(bytes,start, length)){
+		try(ChemicalReader reader = ChemicalReaderFactory.newReader(DEFAULT_MOL_SPEC.getFormatName(), bytes,start, length)){
 			return reader.read();
 		}
 	}
@@ -144,7 +144,7 @@ public class Chemical {
 	 * @throws IOException if there is a problem parsing the mol file.
 	 */
 	public static Chemical parseMol(File mol) throws IOException {
-		try(ChemicalReader reader = ChemicalReaderFactory.newReader(mol)){
+		try(ChemicalReader reader = ChemicalReaderFactory.newReader(DEFAULT_MOL_SPEC.getFormatName(),mol)){
 			return reader.read();
 		}
 	}
@@ -604,9 +604,11 @@ public class Chemical {
 	public String toSmarts() throws IOException{
 		return toSmarts(DEFAULT_SMARTS_SPEC);
 	}
-	
+	public boolean hasPseudoAtoms(){
+		return atoms().anyMatch(Atom::isPseudoAtom);
+	}
 	public boolean hasQueryAtoms() {
-		return atoms().anyMatch(a -> a.isQueryAtom());
+		return atoms().anyMatch(Atom::isQueryAtom);
 	}
 	public boolean hasAtomToAtomMappings() {
 		return atoms().anyMatch(a -> a.getAtomToAtomMap().isPresent());

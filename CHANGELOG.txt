@@ -1,3 +1,9 @@
+0.6.0
+* removed `Atom#getRadicalValue()` since we also have `Atom#getRadical()`
+* more improvements to CTFileCleaner now includes atom block cleanup
+* First work on `ChemicalDataStore`
+* Added a few more methods to `ChemcialReaderFactory` with format paramater
+
 0.5.9
 * fixed spacing in CTFileCleaner STY lines which broke JSdraw
 

@@ -38,7 +38,8 @@ public interface ChemicalSource {
 			}
 		},
 		INCHI,
-		SMARTS;
+		SMARTS,
+        UNKNOWN;
 		
 		public static Type parseType(String format){
 			switch(format){
@@ -53,7 +54,7 @@ public interface ChemicalSource {
 			if(format.startsWith("mol")) {
 				return Type.MOL;
 			}
-			throw new IllegalArgumentException("unknown format: " + format);
+			return Type.UNKNOWN;
 		}
 		
 		public boolean includesCoordinates() {

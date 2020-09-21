@@ -67,7 +67,7 @@ public final class ChemicalReaderFactory {
 	 * Create a new Reader that will read in the {@code length} bytes 
 	 *  from the given byte array starting from the start offset.
 	 *  
-	 *  
+	 * @param format
 	 * @param molBytes the byte encoded molecule data to parse, usually
 	 * a mol file  or SMILES string.
 	 * @param start the start offset in the array to start reading from.
@@ -75,6 +75,28 @@ public final class ChemicalReaderFactory {
 	 * 
 	 * @return a new {@link ChemicalReader}, will never be null.
 	 * 
+	 * @throws IOException if there is a problem parsing the data.
+	 * @throws NullPointerException if molBytes is null.
+	 */
+	public static ChemicalReader newReader(String format, byte[] molBytes, int start, int length) throws IOException{
+		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory(format);
+		if(factory ==null) {
+			throw new IOException("could not find chemical factory for format " + format);
+		}
+		return new DefaultChemicalReader(factory.create(format, molBytes, start, length));
+	}
+	/**
+	 * Create a new Reader that will read in the {@code length} bytes
+	 *  from the given byte array starting from the start offset.
+	 *
+	 *
+	 * @param molBytes the byte encoded molecule data to parse, usually
+	 * a mol file  or SMILES string.
+	 * @param start the start offset in the array to start reading from.
+	 * @param length the number of bytes in thearray to read.
+	 *
+	 * @return a new {@link ChemicalReader}, will never be null.
+	 *
 	 * @throws IOException if there is a problem parsing the data.
 	 * @throws NullPointerException if molBytes is null.
 	 */

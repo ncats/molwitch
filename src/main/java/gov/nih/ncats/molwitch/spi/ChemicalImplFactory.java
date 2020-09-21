@@ -58,6 +58,24 @@ public interface ChemicalImplFactory {
 	 */
 	ChemicalImplReader create(byte[] bytes, int start, int length) throws IOException;
 	/**
+	 * Parse the given data as bytes and create all the {@link ChemicalImpl}s encoded inside it.
+	 * This could be bytes from a file or bytes from a String encoding.
+	 * If it's from a file, the file format is not provided so it could be any of the
+	 * standard cheminformatics file formats.
+	 *  @param format the format the file is encoded in.
+	 * @param bytes the byte array to parse.
+	 * @param start the start offset into the array to start parsing; may be {@code 0}.
+	 * @param length the number of bytes to read from the array.
+	 *
+	 *
+	 * @return a List of {@link ChemicalImpl}, will never be null, and shouldn't be empty.
+	 *
+	 * @throws IOException if there is a problem parsing the bytes.
+	 *
+	 * @since 0.6.0
+	 */
+	ChemicalImplReader create(String format, byte[] bytes, int start, int length) throws IOException;
+	/**
 	 * Parse the given file and create all the {@link ChemicalImpl}s encoded inside it.
 	 * The file format of the file is not provided so it could be any of the
 	 * standard cheminformatics file formats.

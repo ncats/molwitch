@@ -18,10 +18,14 @@
 
 package gov.nih.ncats.molwitch.datastores;
 
+import gov.nih.ncats.common.io.InputStreamSupplier;
 import gov.nih.ncats.common.iter.CloseableIterator;
 import gov.nih.ncats.molwitch.Chemical;
 
 import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 
 public interface ChemicalDataStore extends Closeable {
 
@@ -34,4 +38,29 @@ public interface ChemicalDataStore extends Closeable {
     CloseableIterator<String> getRawIterator();
 
     CloseableIterator<Chemical> getIterator();
+
+
+    static ChemicalDataStore forFile(File f) throws IOException{
+        return forFile(InputStreamSupplier.forFile(f));
+    }
+
+    static ChemicalDataStore forURL(URL url) throws IOException{
+        return forFile(InputStreamSupplier.forResourse(url));
+    }
+
+    static ChemicalDataStore forFile(InputStreamSupplier inputStreamSupplier) throws IOException{
+        return new FileChemicalDataStore(inputStreamSupplier);
+    }
+
+    static ChemicalDataStore forFile(File f, int estimatedNumberOfRecords) throws IOException{
+        return forFile(InputStreamSupplier.forFile(f), estimatedNumberOfRecords);
+    }
+
+    static ChemicalDataStore forURL(URL url, int estimatedNumberOfRecords) throws IOException{
+        return forFile(InputStreamSupplier.forResourse(url), estimatedNumberOfRecords);
+    }
+
+    static ChemicalDataStore forFile(InputStreamSupplier inputStreamSupplier, int estimatedNumberOfRecords) throws IOException{
+        return new FileChemicalDataStore(inputStreamSupplier, estimatedNumberOfRecords);
+    }
 }

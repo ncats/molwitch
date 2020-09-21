@@ -23,11 +23,13 @@ import gov.nih.ncats.common.io.InputStreamSupplier;
 import gov.nih.ncats.common.io.TextLineParser;
 import gov.nih.ncats.common.iter.CloseableIterator;
 import gov.nih.ncats.common.util.Range;
+import gov.nih.ncats.common.yield.Yield;
 import gov.nih.ncats.molwitch.Chemical;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -54,11 +56,16 @@ public class FileChemicalDataStore implements ChemicalDataStore {
         try(TextLineParser parser = new TextLineParser(inputStreamSupplier.get())){
             while(parser.hasNextLine()){
                 String line = parser.nextLine();
+//                System.out.print(line);
                 if(line.startsWith("$$$$")){
                     long nextOffset =parser.getPosition();
                     recordRanges.add(new Range(startOffset, nextOffset -1));
                     startOffset= nextOffset;
                 }
+            }
+            if(parser.getPosition() -1 > startOffset) {
+                //last range
+                recordRanges.add(new Range(startOffset, parser.getPosition() - 1));
             }
         }
     }
@@ -96,12 +103,40 @@ public class FileChemicalDataStore implements ChemicalDataStore {
 
     @Override
     public CloseableIterator<String> getRawIterator() {
-        return null;
+        Yield<String> yield = Yield.create( recipe ->{
+            try(TextLineParser parser = new TextLineParser(inputStreamSupplier.get())){
+                StringBuilder builder = new StringBuilder(2000);
+
+                while(parser.hasNextLine()){
+                    String line = parser.nextLine();
+                    builder.append(line);
+                    if(line.startsWith("$$$$")){
+                       recipe.returning(builder.toString());
+                       builder.setLength(0);    //clears out buffer
+                    }
+                }
+                //last record
+                String lastRecord = builder.toString().trim();
+                if(!lastRecord.isEmpty()){
+                    recipe.returning(builder.toString());
+                }
+            }catch(IOException e){
+                throw new UncheckedIOException(e);
+            }
+        });
+        return yield.iterator();
+
     }
 
     @Override
     public CloseableIterator<Chemical> getIterator() {
-        return null;
+        return CloseableIterator.map(getRawIterator(), s-> {
+            try{
+                return Chemical.parse(s);
+            }catch(IOException e){
+                throw new UncheckedIOException(e);
+            }
+        });
     }
 
     @Override

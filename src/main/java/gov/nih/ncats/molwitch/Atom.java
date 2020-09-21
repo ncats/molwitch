@@ -113,8 +113,7 @@ public interface Atom {
 	void setMassNumber(int mass);
 	
 	int getImplicitHCount();
-	
-	int getRadicalValue();
+
 	
 	boolean isInRing();
 	
@@ -191,7 +190,12 @@ public interface Atom {
 				.findFirst();
 	}
 	int getSmallestRingSize();
-	
+
+	/**
+	 * Get the atom index in its parent Chemical
+	 * or {@code -1} if it does not have a parent.
+	 * @return
+	 */
 	int getAtomIndexInParent();
 	
 	Optional<String> getAlias();
@@ -209,4 +213,5 @@ public interface Atom {
 	default boolean isMetal(){
         return ElementData.isMetal(getAtomicNumber());
     }
+    boolean isPseudoAtom();
 }

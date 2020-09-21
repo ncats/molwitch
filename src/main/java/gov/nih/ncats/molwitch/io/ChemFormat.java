@@ -50,7 +50,12 @@ public interface ChemFormat {
 	}
 	enum KekulizationEncoding{
 		KEKULE,
-		FORCE_AROMATIC
+		FORCE_AROMATIC,
+		/**
+		 * Write out the either kekulized or aromatized
+		 * however the chemical is now.
+		 */
+        AS_IS;
 	}
 	String getName();
 
@@ -90,7 +95,7 @@ public interface ChemFormat {
 		public static final String NAME = "mol";
 		private HydrogenEncoding hydrogenEncoding = HydrogenEncoding.AS_IS; 
 		private Version version = Version.V2000;
-		private KekulizationEncoding kekulization = KekulizationEncoding.KEKULE;
+		private KekulizationEncoding kekulization = KekulizationEncoding.AS_IS;
 		private CoordinateOptions coordinateOptions = CoordinateOptions.AS_IS;
 		
 		public enum CoordinateOptions{

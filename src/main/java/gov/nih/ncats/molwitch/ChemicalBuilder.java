@@ -222,7 +222,13 @@ public class ChemicalBuilder {
 	 * @throws NullPointerException if either parameter is null.
 	 */
 	public Optional<? extends Bond> getBond(Atom a1, Atom a2){
-		return getBond(a1.getAtomIndexInParent(), a2.getAtomIndexInParent());
+		int index1 = a1.getAtomIndexInParent();
+		int index2 = a2.getAtomIndexInParent();
+		//sometimes index returned is -1
+		if(index1 < 0 || index2 < 0){
+			return Optional.empty();
+		}
+		return getBond(index1, index2);
 	}
 
 	/**
