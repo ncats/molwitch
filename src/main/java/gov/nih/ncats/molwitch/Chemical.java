@@ -40,7 +40,6 @@ import gov.nih.ncats.molwitch.io.ChemFormat.SdfFormatSpecification;
 import gov.nih.ncats.molwitch.io.ChemFormat.SmartsFormatSpecification;
 import gov.nih.ncats.molwitch.isotopes.Isotope;
 import gov.nih.ncats.molwitch.spi.ChemicalImpl;
-import gov.nih.ncats.molwitch.spi.ChemicalWriterImplFactory;
 
 /**
  * Represents a Molecule and the contained

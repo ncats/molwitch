@@ -105,14 +105,7 @@ public final class ChemicalReaderFactory {
 		return new DefaultChemicalReader(factory.create(molBytes, start, length));
 	}
 	
-	public static ChemicalReader newReader(InputStream in) throws IOException{
-		Objects.requireNonNull(in, "inputstream can not be null");
-		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory();
-		if(factory ==null) {
-			throw new IOException("could not find chemical factory");
-		}
-		return new DefaultChemicalReader(factory.create(in));
-	}
+
 	public static ChemicalReader newReader(String format, String input) throws IOException{
 		Objects.requireNonNull(input, "input String can not be null");
 		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory(format);
@@ -121,14 +114,7 @@ public final class ChemicalReaderFactory {
 		}
 		return new DefaultChemicalReader(factory.create(format, input));
 	}
-	public static ChemicalReader newReader(String format, InputStream in) throws IOException{
-		Objects.requireNonNull(in, "inputstream can not be null");
-		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory(format);
-		if(factory ==null) {
-			throw new IOException("could not find chemical factory for format " + format);
-		}
-		return new DefaultChemicalReader(factory.create(format, in));
-	}
+
 	/**
 	 * Create a new Reader that will read in the
 	 *  data from the given File.

@@ -52,6 +52,7 @@ public interface ChemicalWriterImplFactory {
 		}
 		return new String(out.toByteArray(), Charsets.UTF_8);
 	}
+
 	ChemicalWriterImpl newInstance(OutputStream out, ChemFormatWriterSpecification spec) throws IOException;
 	
 
