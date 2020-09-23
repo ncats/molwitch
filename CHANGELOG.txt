@@ -3,6 +3,10 @@
 * more improvements to CTFileCleaner now includes atom block cleanup
 * First work on `ChemicalDataStore`
 * Added a few more methods to `ChemcialReaderFactory` with format paramater
+* Added toadded `ChemicalImplFactory#createFromString(format, input)` changed some other ChemicalFactory
+   methods to use that instead.
+* Changed some of the `Chemical.parse()` methods to use TextLineParser to read input as String including EOLs
+* Changed some of the `Chemical.parse(File )` methods to use InputStreamSupplier so we can take compressed files
 
 0.5.9
 * fixed spacing in CTFileCleaner STY lines which broke JSdraw

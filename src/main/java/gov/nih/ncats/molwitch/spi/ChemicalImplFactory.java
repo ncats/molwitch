@@ -41,6 +41,18 @@ public interface ChemicalImplFactory {
 	 * @throws IOException if there is a problem parsing the SMILES.
 	 */
 	ChemicalImpl createFromSmiles(String smiles) throws IOException;
+
+	/**
+	 * Create a {@link ChemicalImpl} from the given SMILES string.
+	 *  @param format the format the data is in.
+	 *
+	 * @param input the data to parse string, will never be null.
+	 *
+	 * @return a new {@link ChemicalImpl}, will never be null.
+	 *
+	 * @throws IOException if there is a problem parsing the SMILES.
+	 */
+	ChemicalImpl createFromString(String format, String input) throws IOException;
 	/**
 	 * Parse the given data as bytes and create all the {@link ChemicalImpl}s encoded inside it.
 	 * This could be bytes from a file or bytes from a String encoding.
@@ -75,6 +87,20 @@ public interface ChemicalImplFactory {
 	 * @since 0.6.0
 	 */
 	ChemicalImplReader create(String format, byte[] bytes, int start, int length) throws IOException;
+	/**
+	 * Parse the given String and create all the {@link ChemicalImpl}s encoded inside it.
+	 *  @param format the format the file is encoded in.
+	 * @param input the String to parse.
+
+	 *
+	 *
+	 * @return a List of {@link ChemicalImpl}, will never be null, and shouldn't be empty.
+	 *
+	 * @throws IOException if there is a problem parsing the bytes.
+	 *
+	 * @since 0.6.0
+	 */
+	ChemicalImplReader create(String format, String input) throws IOException;
 	/**
 	 * Parse the given file and create all the {@link ChemicalImpl}s encoded inside it.
 	 * The file format of the file is not provided so it could be any of the

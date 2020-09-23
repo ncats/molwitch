@@ -26,6 +26,10 @@ import gov.nih.ncats.molwitch.ChemicalSource;
 
 public class MolStringSource extends StringSource{
 
+	public MolStringSource(String data) {
+		super(data, Type.MOL,false);
+		extractProperties(data);
+	}
 	public MolStringSource(String data, Type type) {
 		super(data, type,false);
 		extractProperties(data);

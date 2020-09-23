@@ -113,6 +113,14 @@ public final class ChemicalReaderFactory {
 		}
 		return new DefaultChemicalReader(factory.create(in));
 	}
+	public static ChemicalReader newReader(String format, String input) throws IOException{
+		Objects.requireNonNull(input, "input String can not be null");
+		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory(format);
+		if(factory ==null) {
+			throw new IOException("could not find chemical factory for format " + format);
+		}
+		return new DefaultChemicalReader(factory.create(format, input));
+	}
 	public static ChemicalReader newReader(String format, InputStream in) throws IOException{
 		Objects.requireNonNull(in, "inputstream can not be null");
 		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory(format);
@@ -167,6 +175,10 @@ public final class ChemicalReaderFactory {
         ChemicalImplFactory factory = ImplUtil.getFormatAgnosticFactory();
         return factory.create(input);
     }
+	public static ChemicalImpl read(String format, String input) throws IOException{
+		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory(format);
+		return factory.createFromString(format, input);
+	}
 
 
 

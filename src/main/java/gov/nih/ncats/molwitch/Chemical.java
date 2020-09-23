@@ -18,18 +18,14 @@
 
 package gov.nih.ncats.molwitch;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
+import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import gov.nih.ncats.common.io.TextLineParser;
 import gov.nih.ncats.molwitch.inchi.InChiResult;
 import gov.nih.ncats.molwitch.inchi.Inchi;
 import gov.nih.ncats.molwitch.io.*;
@@ -74,15 +70,12 @@ public class Chemical {
 	 * @throws IOException if there is a problem parsing the mol record.
 	 */
 	public static Chemical parseMol(byte[] bytes, int start, int length) throws IOException {
-		try(ChemicalReader reader = ChemicalReaderFactory.newReader(DEFAULT_MOL_SPEC.getFormatName(), bytes,start, length)){
-			return reader.read();
-		}
+		//read it into a string and then pass it to the String version
+		return parseMol(TextLineParser.parseIntoString(new ByteArrayInputStream(bytes, start, length)));
 	}
 	/**
 	 * Parse a single Chemical from the given mol record provided 
-	 * as an InputStream.  Warning: this input is not closed
-	 * so the caller needs to make sure they close the stream
-	 * after calling this method, preferably in a finally block.
+	 * as an InputStream and then close the stream.
 	 * 
 	 * @param in the inputstream to read; can not be null.
 	 * @return a new Chemical object will never be null but may contain 0 atoms.
@@ -90,9 +83,8 @@ public class Chemical {
 	 * @throws NullPointerException if in is null.
 	 */
 	public static Chemical parseMol(InputStream in)  throws IOException {
-		try(ChemicalReader reader = ChemicalReaderFactory.newReader(in)){
-			return reader.read();
-		}
+	    //read it into a string and then pass it to the String version
+        return parseMol(TextLineParser.parseIntoString(in));
 	}
 	
 	public static Chemical parse(String input) throws IOException{
@@ -122,7 +114,9 @@ public class Chemical {
 	 * @throws IOException if there is a problem parsing the mol record.
 	 */
 	public static Chemical parseMol(String mol) throws IOException {
-		return parseMol(mol.getBytes());
+		String molFormat = DEFAULT_MOL_SPEC.getFormatName();
+		ChemicalImpl impl =ImplUtil.getChemicalImplFactory(molFormat).createFromString(molFormat, mol);
+		return new Chemical(impl, impl.getSource());
 	}
 	/**
 	 * Parse the given mol record byte array into a single {@link Chemical} object.
