@@ -18,16 +18,40 @@
 
 package gov.nih.ncats.molwitch.spi;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 import gov.nih.ncats.molwitch.io.ChemFormat.ChemFormatWriterSpecification;
-public interface ChemicalWriterImplFactory {
+import org.apache.commons.io.Charsets;
 
-	
+public interface ChemicalWriterImplFactory {
+	/**
+	 * Write the given Chemical with the given format specification
+	 * and return the result as a String.
+	 *
+	 * @implNote  by default this executes the code below
+	 * but should be overridden if there is a more efficient way:
+	 * <pre>
+	 * {@code
+	 * ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+	 * try(ChemicalWriterImpl writer = newInstance(out, spec)){
+	 *     writer.write(chemicalImpl);
+	 * }
+	 * return new String(out.toByteArray());
+	 * }
+	 * </pre>
+	 * @param chemicalImpl
+	 * @param spec
+	 * @return
+	 * @throws IOException
+	 * @since 0.6.0
+	 */
+	default String writeAsString(ChemicalImpl chemicalImpl, ChemFormatWriterSpecification spec) throws IOException{
+		ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+		try(ChemicalWriterImpl writer = newInstance(out, spec)){
+			writer.write(chemicalImpl);
+		}
+		return new String(out.toByteArray(), Charsets.UTF_8);
+	}
 	ChemicalWriterImpl newInstance(OutputStream out, ChemFormatWriterSpecification spec) throws IOException;
 	
 

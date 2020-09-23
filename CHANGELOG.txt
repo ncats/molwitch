@@ -7,6 +7,7 @@
    methods to use that instead.
 * Changed some of the `Chemical.parse()` methods to use TextLineParser to read input as String including EOLs
 * Changed some of the `Chemical.parse(File )` methods to use InputStreamSupplier so we can take compressed files
+* added `ChemicalWriterImplFactory#writeAsString` for performance improvements when we want to write out just as a String
 
 0.5.9
 * fixed spacing in CTFileCleaner STY lines which broke JSdraw

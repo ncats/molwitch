@@ -40,6 +40,8 @@ import gov.nih.ncats.molwitch.io.ChemFormat.SdfFormatSpecification;
 import gov.nih.ncats.molwitch.io.ChemFormat.SmartsFormatSpecification;
 import gov.nih.ncats.molwitch.isotopes.Isotope;
 import gov.nih.ncats.molwitch.spi.ChemicalImpl;
+import gov.nih.ncats.molwitch.spi.ChemicalWriterImplFactory;
+
 /**
  * Represents a Molecule and the contained
  * atoms and bonds.
@@ -552,15 +554,10 @@ public class Chemical {
 		return new Chemical(impl.deepCopy(), this.source);
 	}
 	
-	public byte[] formatToBytes(ChemFormatWriterSpecification spec) throws IOException{
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		try(ChemicalWriter writer = ChemicalWriterFactory.newWriter(spec, out)){
-			writer.write(this);
-		}
-		return out.toByteArray();
-	}
+
 	private String formatToString(ChemFormatWriterSpecification spec) throws IOException{
-		return rightTrim(new String(formatToBytes(spec), "UTF-8"));
+		return rightTrim(ChemicalWriterFactory.getImplForFormat(spec)
+							.writeAsString(impl,spec));
 	}
 	
 	public String toSmiles(SmilesFormatWriterSpecification spec) throws IOException{

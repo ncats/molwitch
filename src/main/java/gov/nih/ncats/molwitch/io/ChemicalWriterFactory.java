@@ -75,7 +75,7 @@ public final class ChemicalWriterFactory {
 	
 	
 	
-	private static ChemicalWriterImplFactory getImplForFormat(ChemFormatWriterSpecification spec) {
+	public static ChemicalWriterImplFactory getImplForFormat(ChemFormatWriterSpecification spec) {
 		//can't cache because options could be different
 		//and return different factory for the same format
 		//(ex: mol v2000 vs v3000)
