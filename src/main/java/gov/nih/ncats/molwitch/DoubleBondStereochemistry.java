@@ -18,6 +18,15 @@
 
 package gov.nih.ncats.molwitch;
 
+/**
+ * CIS or TRANS
+ *
+ * A        X
+ *  \     /
+ *   C = C
+ *  /     \
+ * H       H
+ */
 public interface DoubleBondStereochemistry {
 
 	 /**

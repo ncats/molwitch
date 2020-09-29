@@ -20,10 +20,36 @@ package gov.nih.ncats.molwitch;
 
 import java.util.List;
 
+/**
+ * An Allene like Stereocenter configured
+ * with a Carbon in the center, connected to
+ * 2 terminal atoms by double bonds
+ * and each terminal atom connected to
+ * at most 2 peripheral atoms.  It is possible
+ * that a peripheral is an implicit Hydrogen
+ * so there might be fewer peripherals.
+ *
+ * <pre>
+ *
+ * p0          p3
+ *   \        /
+ *    T = C = T
+ *   /         \
+ * p1          p4
+ * </pre>
+ */
 public interface ExtendedTetrahedralChirality extends Stereocenter{
-
+	/**
+	 * Get the 2 atoms that are double bonded to the center atom.
+	 * @return
+	 */
 	List<Atom> getTerminalAtoms();
 
+	/**
+	 * Get the atoms that are bonded to the terminal atoms
+	 * which aren't the center atom.
+	 * @return
+	 */
 	List<Atom> getPeripheralAtoms();
 
 	Atom getCenterAtom();
