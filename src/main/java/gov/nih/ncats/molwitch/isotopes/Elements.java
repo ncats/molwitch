@@ -158,4 +158,8 @@ public class Elements {
     public static String getSymbolByAtomicNumber(int atomicNumber){
         return elements[atomicNumber];
     }
+
+    public static boolean isMetal(int atomicNumber){
+        return ElementData.isMetal(atomicNumber);
+    }
 }
