@@ -680,12 +680,12 @@ public class Chemical {
 	 * @return true (currently always even if nothing is removed)
 	 */
 	public boolean removeNonDescriptHydrogens() {
-
-		Stream<Atom> atomsToCheck = atoms();
-		if (this.hasSGroups()) {
+		Chemical t=this;
+		Stream<Atom> atomsToCheck = t.atoms();
+		if (t.hasSGroups()) {
 
 			Stream<Atom> atomsToIgnore = Stream.empty();
-			for(SGroup sgroup : this.getSGroups()){
+			for(SGroup sgroup : t.getSGroups()){
 				atomsToIgnore = Stream.concat(atomsToIgnore, sgroup.getAtoms());
 				atomsToIgnore = Stream.concat(atomsToIgnore,  sgroup.getOutsideNeighbors());
 			}
@@ -696,8 +696,12 @@ public class Chemical {
 
 		for (Atom ca : atomsToCheck.filter(a-> "H".equals(a.getSymbol()))
 				.filter(h -> h.getMassNumber() ==0 && h.getRadical() == 0
-						&& h.getChirality().getParity() == 0 && h.getCharge() == 0
-						&& !h.getAtomToAtomMap().isPresent())
+						&& h.getBondCount()==1 
+						&& h.getCharge() == 0
+						&& !h.getAtomToAtomMap().isPresent()
+						&& h.getNeighbors().get(0).getChirality().getParity() == 0
+						)
+				.filter(h -> !"H".equals(h.getNeighbors().get(0).getSymbol()))
 				.collect(Collectors.toList())
 
 		) {
@@ -705,8 +709,19 @@ public class Chemical {
 			for (Bond cb : ca.getBonds()) {
 				Atom ca2 = cb.getOtherAtom(ca);
 				if (!ca2.isQueryAtom()) {
-					if (cb.getStereo() == Bond.Stereo.NONE) {
-						this.removeAtom(ca);
+					Integer hcount = ca2.getImplicitHCount();
+					if(hcount==null){
+						hcount=0;	
+					}
+					//This gets weird if there is no stereo bond
+					//concept in the underlying toolkit
+					if (cb.getStereo() == Bond.Stereo.NONE) { 
+						t.removeAtom(ca);
+						// It's not ideal to do this, but is required by some
+						// libraries. We may consider making the act of
+						// removing a Hydrogen through removeAtom
+						// due this already if neeeded.
+						ca2.setImplicitHCount(hcount+1);
 					}
 				}
 			}
