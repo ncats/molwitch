@@ -226,7 +226,7 @@ public interface ChemicalImpl<T extends ChemicalImpl<T>> {
 	
 	boolean hasSGroups();
 	void expandSGroups();
-	void generateCoordinates() throws ChemkitException;
+	void generateCoordinates() throws MolwitchException;
 	void flipChirality(Stereocenter s);
 	
 	

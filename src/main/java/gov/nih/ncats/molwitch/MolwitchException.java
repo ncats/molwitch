@@ -18,17 +18,17 @@
 
 package gov.nih.ncats.molwitch;
 
-public class ChemkitException extends Exception{
+public class MolwitchException extends Exception{
 
-	public ChemkitException(String message, Throwable cause) {
+	public MolwitchException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ChemkitException(String message) {
+	public MolwitchException(String message) {
 		super(message);
 	}
 
-	public ChemkitException(Throwable cause) {
+	public MolwitchException(Throwable cause) {
 		super(cause);
 	}
 

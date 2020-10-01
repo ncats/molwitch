@@ -1040,7 +1040,7 @@ public class Chemical {
 		
 	}
 	
-	public void generateCoordinates() throws ChemkitException{
+	public void generateCoordinates() throws MolwitchException {
 		impl.generateCoordinates();
 	}
 
