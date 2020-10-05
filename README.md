@@ -6,7 +6,7 @@ any client code.
 
 
 ## Available on Maven Central
-Usually, one needs to add 2 dependencies:
+Usually, one needs to add multiple dependencies for bgoth `molwitch` as well as the underlying toolkit:
 This adds the API.
 ```
 <dependency>
@@ -18,7 +18,7 @@ This adds the API.
 
 There also needs to be a molwitch implementation
 
-To add CDK:
+To add [molwitch-CDK](https://github.com/ncats/molwitch-cdk) :
 ```
 <dependency>
         <groupId>gov.nih.ncats</groupId>
@@ -26,3 +26,9 @@ To add CDK:
         <version>1.0.4</version>
 </dependency>
 ```
+
+## License 
+This project is Open Sourced under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0) 
+However the underlying molwitch implementations may use different licences depending on the license
+of the underlying toolkit.
+
