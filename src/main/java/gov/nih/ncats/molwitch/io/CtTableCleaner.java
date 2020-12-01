@@ -44,6 +44,7 @@ import java.util.Map;
  *     <li>Remove S-Group parent atoms if S-Group type isn't MUL</li>
  *     <li>Remove STY group types that have already been declared</li>
  *     <li>break M  SAL lines with more than 15 atoms into multiple lines with at most 8 atoms per line</li>
+ *     <li>break M  SAL lines with atom positions &lt; 1 are removed from the atom list</li>
  *     <li>break M  CHG lines with more than 8 charges into multiple lines with at most 8 charges per line</li>
  *     <li>break M  STY lines with more than 8 Sgroups into multiple lines with at most 8 S-groups per line</li>
  *     <li>break S-Group EXP lines with more than 15 into multiple lines with at most 15 per line</li>
@@ -77,6 +78,11 @@ public final class CtTableCleaner {
     public static CloseableIterator<String> clean(InputStream molOrSdInputStream) throws IOException{
 
         return new SdfUtil.CleanSdfIterator(new BufferedReader(new InputStreamReader(molOrSdInputStream)));
+
+    }
+    public static CloseableIterator<String> clean(BufferedReader molOrSdReader) throws IOException{
+
+        return new SdfUtil.CleanSdfIterator(molOrSdReader);
 
     }
 }

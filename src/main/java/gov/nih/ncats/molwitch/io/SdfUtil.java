@@ -380,22 +380,30 @@ class SdfUtil {
                                     continue;
                                 }else if("SAL".equals(typeCode)){
                                     int numAtoms = scanner.nextInt();
-                                    if (numAtoms <= 15) {
-                                        //fine as is
-                                        buffer.append(line).append("\n");
-                                    } else {
+//                                    if (numAtoms <= 15) {
+//                                        //fine as is
+//                                        buffer.append(line).append("\n");
+//                                    } else {
                                         //break into blocks of 15
                                         int numLines = numAtoms / 15 + 1;
 
                                         for (int i = 0; i < numLines; i++) {
                                             int atomsOnLine = Math.min(15, (numAtoms - (i * 15)));
 
-                                            buffer.append("M  SAL").append(String.format(" %3d %2d", sgroupNumber, atomsOnLine));
-                                            for (int j = 0; j < atomsOnLine; j++) {
-                                                buffer.append(String.format(" %3d", scanner.nextInt()));
+                                            int validAtoms=0;
+                                            StringBuilder tmp = new StringBuilder();
+                                             for (int j = 0; j < atomsOnLine; j++) {
+                                                 int offset =  scanner.nextInt();
+                                                 if(offset>0) {
+                                                     validAtoms++;
+                                                     tmp.append(String.format(" %3d", offset));
+                                                 }
                                             }
-                                            buffer.append("\n");
-                                        }
+                                             tmp.append("\n");
+                                            if(validAtoms >0) {
+                                                buffer.append(String.format("M  SAL %3d%3d", sgroupNumber, validAtoms)).append(tmp);
+                                            }
+//                                        }
                                     }
                                 }else if("SED".equals(typeCode)){
                                     if(currentDataBuilder ==null){
