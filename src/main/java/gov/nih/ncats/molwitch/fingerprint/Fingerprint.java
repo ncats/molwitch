@@ -42,7 +42,7 @@ public class Fingerprint {
 	 * @throws NullPointerException if fp is null
 	 */
 	public static Fingerprint fromBinaryString(String fp) {
-		return new Fingerprint(fromString(fp));
+		return new Fingerprint(fromString(fp), fp.trim().length());
 	}
 	
 	private static BitSet fromString(String binary) {
@@ -60,13 +60,18 @@ public class Fingerprint {
 	 * for its compact-ness and ease of logical operations.
 	 */
 	private final BitSet bits;
+	/**
+	 * Number of bits stored for this fingerprint (this may be different than the Bitset length).
+	 */
+	private final int bitLength;
 	
 	/**
 	 * Create a new fingerprint object for the given bitset array.
 	 * 
 	 * @param bits the {@link BitSet} of this fingerprint.
 	 */
-	public Fingerprint(BitSet bits) {
+	public Fingerprint(BitSet bits, int bitLength) {
+		this.bitLength = bitLength;
 		this.bits = bits;
 	}
 	/**
@@ -75,6 +80,8 @@ public class Fingerprint {
 	 * @param bytes the byte array of this fingerprint.
 	 */
 	public Fingerprint(byte[] bytes) {
+
+		this.bitLength = bytes.length *8;
 		this.bits = BitSet.valueOf(bytes);
 	}
 	/**
@@ -94,7 +101,8 @@ public class Fingerprint {
 		//the and() operation on BitSet modifies 
 		BitSet result = copyOfBitset();
 		result.and(other.bits);
-		return new Fingerprint(result);
+		int andedLength = Math.max(bitLength, other.bitLength);
+		return new Fingerprint(result, andedLength);
 	}
 	
 	/**
@@ -147,9 +155,9 @@ public class Fingerprint {
 		//so make a full length byte array
 		//and then copy the contents from the bitset into it.
 		//this should then include the correct amount of trailing zeroes.
-		byte[] bytes = new byte[getLength()];
+		byte[] bytes = new byte[bitLength/8];
 		byte[] bitsetBytes = bits.toByteArray();
-		System.arraycopy(bitsetBytes, 0, bytes, 0, bitsetBytes.length);
+		System.arraycopy(bitsetBytes, 0, bytes, 0, bytes.length);
 		return bytes;
 	}
     /**
@@ -157,7 +165,7 @@ public class Fingerprint {
      * @return a new byte array.
      */
 	public int[] toIntArray(){
-        int[] temp = new int[bits.size() / 32];
+        int[] temp = new int[bitLength / 32];
 
         for (int i = 0; i < temp.length; i++) {
             for (int j = 0; j < 32; j++) {
@@ -285,11 +293,11 @@ public class Fingerprint {
 	}
 	
 	/**
-	 * Get the length of this fingerprint.
+	 * Get the number of bits in this fingerprint (some might not be set).
 	 * @return the length.
 	 */
 	public int getLength() {
-		return bits.size();
+		return bitLength;
 	}
 	@Override
 	public int hashCode() {
