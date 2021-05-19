@@ -22,9 +22,7 @@ import gov.nih.ncats.common.util.CachedSupplier;
 import gov.nih.ncats.molwitch.Chemical;
 import gov.nih.ncats.molwitch.spi.MolSearcherImplFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 
 public class MolSearcherFactory {
 
@@ -38,11 +36,20 @@ public class MolSearcherFactory {
     private MolSearcherFactory(){
         //can not instantiate
     }
-    public static MolSearcher create(String smartsPattern){
-        return searchers.get().iterator().next().create(smartsPattern);
+    public static Optional<MolSearcher> create(String smartsPattern){
+        Iterator<MolSearcherImplFactory> iterator = searchers.get().iterator();
+        if(iterator.hasNext()){
+            return Optional.ofNullable(iterator.next().create(smartsPattern));
+        }
+        return Optional.empty();
     }
 
-    public static MolSearcher create(Chemical query){
-        return searchers.get().iterator().next().create(query);
+    public static Optional<MolSearcher> create(Chemical query){
+
+        Iterator<MolSearcherImplFactory> iterator = searchers.get().iterator();
+        if(iterator.hasNext()){
+            return Optional.ofNullable(iterator.next().create(query));
+        }
+        return Optional.empty();
     }
 }
