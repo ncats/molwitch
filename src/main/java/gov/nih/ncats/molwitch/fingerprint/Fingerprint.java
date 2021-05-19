@@ -157,7 +157,7 @@ public class Fingerprint {
 		//this should then include the correct amount of trailing zeroes.
 		byte[] bytes = new byte[bitLength/8];
 		byte[] bitsetBytes = bits.toByteArray();
-		System.arraycopy(bitsetBytes, 0, bytes, 0, bytes.length);
+		System.arraycopy(bitsetBytes, 0, bytes, 0, Math.min(bitsetBytes.length, bytes.length));
 		return bytes;
 	}
     /**
