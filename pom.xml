@@ -28,7 +28,7 @@
 
     <name>ncats-molwitch</name>
 
-    <url>https://spotlite.nih.gov/ncats/molwitch/</url>
+    <url>https://github.com/ncats/molwitch/</url>
     <description>A Bridge interface to abstract the underlying cheminformatics library is used.</description>
     <organization>
         <name>NIH/NCATS</name>
@@ -56,7 +56,7 @@
     </developers>
 
     <scm>
-        <url>https://github.com/ncats/molwitch</url>
+        <url>https://github.com/ncats/molwitch.git</url>
     </scm>
 
     <distributionManagement>
@@ -77,10 +77,11 @@
             <artifactId>ncats-common</artifactId>
             <version>0.3.4</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -144,7 +145,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -152,6 +153,7 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+
                             </execution>
                         </executions>
                     </plugin>
