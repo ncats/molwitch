@@ -61,7 +61,13 @@ public final class CtTableCleaner {
         //can not instantiate
     }
 
-
+    /**
+     * Cleans a mol String and returns a new cleaned String.
+     *
+     * @param molOrSdText the input mol string to clean
+     * @return a new String that is the cleaned mol file.
+     * @throws IOException if there are any problems parsing the mol file.
+     */
     public static String clean(String molOrSdText) throws IOException{
         StringWriter out = new StringWriter(molOrSdText.length());
         try(BufferedReader reader = new BufferedReader(new StringReader(molOrSdText));
