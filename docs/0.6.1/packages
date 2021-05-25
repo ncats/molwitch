@@ -1,0 +1,10 @@
+gov.nih.ncats.molwitch.inchi
+gov.nih.ncats.molwitch
+gov.nih.ncats.molwitch.fingerprint
+gov.nih.ncats.molwitch.datastores
+gov.nih.ncats.molwitch.io
+gov.nih.ncats.molwitch.internal
+gov.nih.ncats.molwitch.internal.source
+gov.nih.ncats.molwitch.search
+gov.nih.ncats.molwitch.spi
+gov.nih.ncats.molwitch.isotopes
