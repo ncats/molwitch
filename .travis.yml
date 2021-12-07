@@ -1,0 +1,5 @@
+language: java
+#this will run this on open jdks for both java 8 and java 11
+jdk:
+  - openjdk8
+  - openjdk11
