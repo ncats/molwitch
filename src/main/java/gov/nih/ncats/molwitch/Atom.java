@@ -41,7 +41,7 @@ public interface Atom {
 
 	/**
 	 * Set the atomic number of this atom.
-	 * @param atomicNumber
+	 * @param atomicNumber the atomic number of this atom.
 	 */
 	void setAtomicNumber(int atomicNumber);
 	/**
@@ -151,7 +151,7 @@ public interface Atom {
 	 * Get the Atoms that this atom
 	 * is bonded to.
 	 * 
-	 * @return
+	 * @return the list of Atoms; will never be null but may be emtpy.
 	 */
 	default List<Atom> getNeighbors(){
 		return getBonds().stream()
@@ -192,9 +192,9 @@ public interface Atom {
 	int getSmallestRingSize();
 
 	/**
-	 * Get the atom index in its parent Chemical
-	 * or {@code -1} if it does not have a parent.
-	 * @return
+	 * Get the 0-based atom index in its parent Chemical.
+	 *
+	 * @return the index or {@code -1} if it does not have a parent.
 	 */
 	int getAtomIndexInParent();
 	

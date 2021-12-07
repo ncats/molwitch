@@ -17,7 +17,7 @@
  */
 
 /**
- * Contains classes to deal with reading and writing {@link gov.nih.ncats.chemkit.api.Chemical}
+ * Contains classes to deal with reading and writing {@link gov.nih.ncats.molwitch.Chemical}
  * objects to different formats.
  * 
  * 

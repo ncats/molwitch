@@ -198,10 +198,10 @@ public interface ChemicalImplFactory {
     ChemicalImpl create(String unknownFormattedInput) throws IOException;
 
     /**
-     * This factory can support multiple (hopefully any) format not just a particular type.
+     * This factory can support multiple (hopefully every) format not just a particular type.
      * Ideally this factory has it's own way of detecting the format of the chemical objects to read
      * or the parser implementation supports multiple formats.
-     * @return
+     * @return {@code true} if this factory is format agnostic; {@code false} otherwise.
      *
      * @since 0.5.2
      */

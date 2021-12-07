@@ -70,7 +70,9 @@ public abstract class AtomCoordinates implements Comparable<AtomCoordinates>{
 	
 	/**
      * Returns the angle between this point and that point.
-     * @return the angle in radians (between –&pi; and &pi;) between this point and that point (0 if equal)
+	 * @param that the other point; can not be {@code null}.
+     * @return the angle in radians (between –&pi; and &pi;) between this point and that point (0 if equal).
+	 * @throws NullPointerException if {@code that} is null.
      */
     public double angleTo(AtomCoordinates that) {
         double dx = that.getX() - getX() ;

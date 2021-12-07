@@ -41,19 +41,27 @@ import java.util.List;
 public interface ExtendedTetrahedralChirality extends Stereocenter{
 	/**
 	 * Get the 2 atoms that are double bonded to the center atom.
-	 * @return
+	 *  @return the list of Terminal Atoms; should never be null but may be empty.
 	 */
 	List<Atom> getTerminalAtoms();
 
 	/**
 	 * Get the atoms that are bonded to the terminal atoms
 	 * which aren't the center atom.
-	 * @return
+	 * @return the list of Peripheral Atoms; should never be null but may be empty.
 	 */
 	List<Atom> getPeripheralAtoms();
 
+	/**
+	 * Get the Atom in the center.
+	 * @return the center {@link Atom}; should never be {@code null}.
+	 */
 	Atom getCenterAtom();
-	
+
+	/**
+	 * Get the {@link Chirality}.
+	 * @return the {@link Chirality}; should never be {@code null}.
+	 */
 	Chirality getChirality();
 
 }

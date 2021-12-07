@@ -20,6 +20,7 @@ package gov.nih.ncats.molwitch.fingerprint;
 
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Objects;
 import java.util.OptionalDouble;
 
 /**
@@ -66,13 +67,21 @@ public class Fingerprint {
 	private final int bitLength;
 	
 	/**
-	 * Create a new fingerprint object for the given bitset array.
+	 * Create a new fingerprint object for the given bitset and the length of this fingerprint.
+	 *
 	 * 
 	 * @param bits the {@link BitSet} of this fingerprint.
+	 * @param bitLength the length of this fingerprint.  The bitlength should always be
+	 *                  &ge; the highest set bit in the given bitset.
+	 * @throws NullPointerException if bits is null.
+	 * @throws IllegalArgumentException if bitLength is &lt; 1.
 	 */
 	public Fingerprint(BitSet bits, int bitLength) {
+		if(bitLength <1){
+			throw new IllegalArgumentException("bitLength must be >=1");
+		}
 		this.bitLength = bitLength;
-		this.bits = bits;
+		this.bits = Objects.requireNonNull(bits);
 	}
 	/**
 	 * Create a new fingerprint object for the given byte array.

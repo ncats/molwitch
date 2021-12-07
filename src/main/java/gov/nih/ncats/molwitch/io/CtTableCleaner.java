@@ -30,8 +30,8 @@ import java.util.Map;
  * data by fixing common problems that happen from
  * copy and paste errors or known tools and produce invalid results.
  *
- * <p/>
- * Current Fixes include:
+ *
+ * <p>Current Fixes include:</p>
  * <ul>
  *     <li>Correcting header if it has too few lines</li>
  *     <li>fix additional whitespace in leading or trailing records</li>
@@ -54,6 +54,7 @@ import java.util.Map;
  *     <li>Data Sgroups SCD and SED lines are reformatted to be max 69 characters of data per line</li>
  *     <li>ignore anything after the M  END line start, as it sometimes is added by accident in a few tools</li>
  * </ul>
+ *
  */
 public final class CtTableCleaner {
 

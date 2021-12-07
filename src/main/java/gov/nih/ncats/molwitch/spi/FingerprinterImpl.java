@@ -43,7 +43,7 @@ public interface FingerprinterImpl{
 	 * 
 	 * This is used by 
 	 * 
-	 * @param options the FingerPrinterOptions to check which may include 
+	 * @param spec the FingerPrinterOptions to check which may include
 	 * the name of the algorithm, any parameter settings.
 	 * 
 	 * @return {@code true} if it does support it; {@code false} otherwise.
@@ -51,7 +51,7 @@ public interface FingerprinterImpl{
 	 * @apiNote the default implemenation where {@link #isDefault()}
 	 * returns {@code true} should always return true.
 	 */
-	boolean supports(Fingerprinters.FingerprintSpecification options);
+	boolean supports(FingerprintSpecification spec);
 
 	/**
 	 * Is this implementation the default implementation
@@ -62,13 +62,18 @@ public interface FingerprinterImpl{
 	 * {@code false} otherwise.
 	 */
 	boolean isDefault();
+
+	/**
+	 * Get the set of Algorithm names this Fingerprinter supports.
+	 * @return the set of algorithm names; can not be null but may be empty.
+	 */
 	Set<String> getSupportedAlgorithmNames();
 	/**
-	 * 
-	 * @param fingerPrinterOptions
-	 * @return
+	 * Create a {@link Fingerprinter} with the given specification.
+	 * @param spec the {@link FingerprintSpecification}
+	 * @return a new Fingerprinter.
 	 */
-	Fingerprinter createFingerPrinterFor(FingerprintSpecification fingerPrinterOptions);
+	Fingerprinter createFingerPrinterFor(FingerprintSpecification spec);
 
 	/**
 	 * Create a new Fingerprinter object using the default

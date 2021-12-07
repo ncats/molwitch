@@ -170,10 +170,45 @@
                             </execution>
                         </executions>
                     </plugin>
+<!--                    &lt;!&ndash;<plugin>-->
+<!--                        <groupId>org.apache.maven.plugins</groupId>-->
+<!--                        <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--                        <version>3.3.1</version>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+
+<!--                                <id>attach-javadocs</id>-->
+<!--                                <goals>-->
+<!--                                    <goal>jar</goal>-->
+<!--                                </goals>-->
+
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                        <configuration>-->
+<!--                            <doclint>all,-missing</doclint>-->
+<!--                            <tags>-->
+<!--                                <tag>-->
+<!--                                    <name>apiNote</name>-->
+<!--                                    <placement>a</placement>-->
+<!--                                    <head>API Note:</head>-->
+<!--                                </tag>-->
+<!--                                <tag>-->
+<!--                                    <name>implSpec</name>-->
+<!--                                    <placement>a</placement>-->
+<!--                                    <head>Implementation Requirements:</head>-->
+<!--                                </tag>-->
+<!--                                <tag>-->
+<!--                                    <name>implNote</name>-->
+<!--                                    <placement>a</placement>-->
+<!--                                    <head>Implementation Note:</head>-->
+<!--                                </tag>-->
+<!--                            </tags>-->
+<!--                        </configuration>-->
+<!--                    </plugin>&ndash;&gt;-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>
+
                         <executions>
                             <execution>
 
@@ -181,12 +216,30 @@
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
-                                <configuration>
-                                    <additionalparam>-Xdoclint:none</additionalparam>
-                                </configuration>
+
                             </execution>
                         </executions>
+                        <configuration>
+                            <tags>
+                                <tag>
+                                    <name>apiNote</name>
+                                    <placement>a</placement>
+                                    <head>API Note:</head>
+                                </tag>
+                                <tag>
+                                    <name>implSpec</name>
+                                    <placement>a</placement>
+                                    <head>Implementation Requirements:</head>
+                                </tag>
+                                <tag>
+                                    <name>implNote</name>
+                                    <placement>a</placement>
+                                    <head>Implementation Note:</head>
+                                </tag>
+                            </tags>
+                        </configuration>
                     </plugin>
+
                 </plugins>
             </build>
         </profile>

@@ -67,7 +67,7 @@ public final class ChemicalReaderFactory {
 	 * Create a new Reader that will read in the {@code length} bytes 
 	 *  from the given byte array starting from the start offset.
 	 *  
-	 * @param format
+	 * @param format the format the molBytes are encoded in.
 	 * @param molBytes the byte encoded molecule data to parse, usually
 	 * a mol file  or SMILES string.
 	 * @param start the start offset in the array to start reading from.
