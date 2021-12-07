@@ -1,3 +1,5 @@
+[![Build Status](https://app.travis-ci.com/ncats/molwitch.svg?branch=master)](https://app.travis-ci.com/ncats/molwitch)
+
 **W**hich **I**nternal **T**oolkit for **CH**emicals
 # MolWitch
 MolWitch is a Bridge Pattern wrapper around various Cheminformatics Toolkits
@@ -6,7 +8,7 @@ any client code.
 
 
 ## Available on Maven Central
-Usually, one needs to add multiple dependencies for bgoth `molwitch` as well as the underlying toolkit:
+Usually, one needs to add multiple dependencies for both `molwitch` as well as the underlying toolkit:
 This adds the API.
 ```
 <dependency>
