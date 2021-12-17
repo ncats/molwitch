@@ -63,15 +63,28 @@ public final class Inchi {
 		return !hasProblemAtoms;
 	}
 	public static InChiResult asStdInchi(Chemical chemical, boolean trustCoordinates) throws IOException{
+		//1. first see if we can use the jna-inchi and try that if we call.
+		//2. fall back to using the inchi implementation of the molwitch flavor:
+
+		//inchi doesn't work well with pseudo atoms, R groups and queries
+		//so first see if this chemical has something like that.
+		//as of this writing, it is not simple to mess around with atoms and bonds at the molwitch-api
+		//level like that while the molwithc-flavor is more able to fiddle with things at the implementation level
+		//and might have their own workarounds.
 		if(canDoDirectInchi(chemical)) {
+//			String molText = chemical.toMol(new ChemFormat.MolFormatSpecification()
+//											.setKekulization(ChemFormat.KekulizationEncoding.KEKULE)
+//											.setHydrogenEncoding(ChemFormat.HydrogenEncoding.MAKE_EXPLICIT));
 			String molText = chemical.toMol();
+			//JNA-inchi can take mol files
 			InchiOutput output = JnaInchi.molToInchi(molText);
-			InChiResult.Builder builder = new InChiResult.Builder(convertEnumStatus(output.getStatus()));
-			builder.setMessage(output.getMessage() == null ? "" : output.getMessage());
-			builder.setAuxInfo(output.getAuxInfo() == null ? "" : output.getAuxInfo());
 
 
 			if (output.getStatus() == InchiStatus.SUCCESS || output.getStatus() == InchiStatus.WARNING) {
+				InChiResult.Builder builder = new InChiResult.Builder(convertEnumStatus(output.getStatus()));
+				builder.setMessage(output.getMessage() == null ? "" : output.getMessage());
+				builder.setAuxInfo(output.getAuxInfo() == null ? "" : output.getAuxInfo());
+
 				String fullInchi = output.getInchi();
 				builder.setInchi(fullInchi);
 				InchiKeyOutput keyOutput = JnaInchi.inchiToInchiKey(fullInchi);
