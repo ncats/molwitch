@@ -63,7 +63,7 @@ public class ChemicalBuilder {
 	 * @throws NullPointerException if name is null.
 	 */
 	public static ChemicalBuilder createFromInchi(String inchi) throws IOException{
-		return _fromImpl(Inchi.toChemical(inchi).getImpl());
+		return Inchi.toChemicalBuilder(inchi);
 	}
 	/**
 	 * Look up the name of the chemical by its name
@@ -395,7 +395,16 @@ public class ChemicalBuilder {
 		
 		return impl.addBond(atom1, atom2, type);
 	}
-	
+	public  TetrahedralChirality addDoubleBondStereo( Atom carbonAtom1, Atom carbonAtom2, Chirality chirality, Atom... peripheralAtoms){
+		return impl.addDoubleBondStereo(carbonAtom1, carbonAtom2, chirality, peripheralAtoms);
+	}
+	public  TetrahedralChirality addTetrahedralStereo(Atom centerAtom, Chirality chirality, Atom... peripheralAtoms){
+		return impl.addTetrahedralStereo(centerAtom, chirality, peripheralAtoms);
+	}
+	public  ExtendedTetrahedralChirality addExtendedTetrahedralStereo(Atom centerAtom, Atom terminalAtom1, Atom terminalAtom2, Chirality chirality, Atom... peripheralAtoms){
+		return impl.addExtendedTetrahedralStereo(centerAtom, terminalAtom1, terminalAtom2, chirality, peripheralAtoms);
+	}
+
 	public ChemicalBuilder makeHydrogensExplicit(boolean makeHydrogensExplicit) {
 		this.makeHydrogensExplicit = makeHydrogensExplicit;
 		

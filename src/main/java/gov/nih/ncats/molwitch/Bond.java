@@ -64,6 +64,8 @@ public interface Bond {
 	Bond switchParity();
 	
 	void setStereo(Stereo stereo);
+
+	void setDoubleBondStereo(DoubleBondStereo doubleBondStereo);
 	
 	void setBondType(BondType type);
 	

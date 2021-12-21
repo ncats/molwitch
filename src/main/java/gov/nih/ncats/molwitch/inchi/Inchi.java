@@ -19,15 +19,12 @@
 package gov.nih.ncats.molwitch.inchi;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import gov.nih.ncats.common.util.CachedSupplier;
-import gov.nih.ncats.molwitch.Atom;
-import gov.nih.ncats.molwitch.Chemical;
+import gov.nih.ncats.molwitch.*;
 import gov.nih.ncats.molwitch.spi.InchiImplFactory;
 import io.github.dan2097.jnainchi.*;
 
@@ -111,8 +108,31 @@ public final class Inchi {
 		}
 		throw new IOException("could not find suitable inchi writer");
 	}
-	
 	public static Chemical toChemical(String inchi) throws IOException{
+		return (Chemical) toChemicalBuilder(inchi, true);
+	}
+	public static ChemicalBuilder toChemicalBuilder(String inchi) throws IOException{
+		return (ChemicalBuilder) toChemicalBuilder(inchi, false);
+	}
+	private static Object toChemicalBuilder(String inchi, boolean asChemical) throws IOException{
+		//first see if we can use jna-inchi
+		//jna inchi string needs the InChi=1S/ prefix
+		//but some times we don't have the inchi = part
+		String jnaInchiString;
+		if(inchi.startsWith("InChI=")){
+			jnaInchiString = inchi;
+		}else{
+			jnaInchiString = "InChI="+inchi;
+		}
+		InchiInputFromInchiOutput inchiInputFromInchi= JnaInchi.getInchiInputFromInchi(jnaInchiString);
+		if(InchiStatus.SUCCESS == inchiInputFromInchi.getStatus()){
+			InchiInput inchiInput = inchiInputFromInchi.getInchiInput();
+			ChemicalBuilder builder= convertToChemicalBuilder(inchiInput, jnaInchiString);
+			if(asChemical){
+				return builder.build();
+			}
+			return builder;
+		}
 		Matcher matcher = STD_INCHI_PREFIX.matcher(inchi);
 		if(!matcher.find()) {
 			//TODO should we error out here?
@@ -120,9 +140,144 @@ public final class Inchi {
 		for(InchiImplFactory impl : implLoaders.get()) {
 			Chemical result =  impl.parseInchi(inchi);
 			if(result !=null) {
-				return result;
+				if(asChemical){
+					return result;
+				}
+				return ChemicalBuilder._fromImpl(result.getImpl());
 			}
 		}
 		throw new IOException("could not find suitable inchi parser");
+	}
+
+	private static ChemicalBuilder convertToChemicalBuilder(InchiInput inchiInput, String originalInchiString) {
+		ChemicalBuilder builder = new ChemicalBuilder();
+		Map<InchiAtom, Atom> atomMap = new HashMap<>();
+		for(InchiAtom atom : inchiInput.getAtoms()){
+			Atom a = builder.addAtom(atom.getElName());
+//			if(atom.getCharge() !=0) {
+//				a.setCharge(atom.getCharge());
+//			}
+//			int implH = atom.getImplicitHydrogen();
+//			if(implH > 0) {
+//				a.setImplicitHCount(implH);
+//			}
+			if(atom.getIsotopicMass() >0) {
+				a.setMassNumber(atom.getIsotopicMass());
+			}
+			atomMap.put(atom, a);
+		}
+		for(InchiBond bond : inchiInput.getBonds()){
+			Bond b = builder.addBond(atomMap.get(bond.getStart()), atomMap.get(bond.getEnd()),
+					Bond.BondType.ofOrder(bond.getType().ordinal()));
+			switch(bond.getStereo()){
+				case SINGLE_1DOWN: b.setStereo(Bond.Stereo.DOWN);
+									break;
+				case SINGLE_1UP: b.setStereo(Bond.Stereo.UP);
+					break;
+				case SINGLE_1EITHER: b.setStereo(Bond.Stereo.UP_OR_DOWN);
+					break;
+				case SINGLE_2DOWN: b.setStereo(Bond.Stereo.DOWN_INVERTED);
+					break;
+				case SINGLE_2UP: b.setStereo(Bond.Stereo.UP_INVERTED);
+					break;
+				case SINGLE_2EITHER: b.setStereo(Bond.Stereo.UP_OR_DOWN_INVERTED);
+					break;
+
+			}
+
+		}
+		for(Map.Entry<InchiAtom, Atom> entry : atomMap.entrySet()){
+			//now set implH incase setting bonds messed that up
+			int implH = entry.getKey().getImplicitHydrogen();
+			if(implH !=0){
+				entry.getValue().setImplicitHCount(implH);
+			}
+			int charge = entry.getKey().getCharge();
+			entry.getValue().setCharge(charge);
+		}
+		for(InchiStereo stereo : inchiInput.getStereos()){
+			switch(stereo.getType()){
+				case DoubleBond: setDoubleBondStereo(stereo, atomMap, builder);
+								break;
+				case Tetrahedral: setTetrahedral(stereo, atomMap, builder);
+								break;
+				case Allene: setExtendedTetrahedral(stereo, atomMap, builder);
+					break;
+			}
+		}
+		
+		builder.computeStereo(true);
+		builder.setSource(new InchiSource(originalInchiString));
+		return builder;
+	}
+
+	private static void setDoubleBondStereo(InchiStereo stereo, Map<InchiAtom, Atom> atomMap, ChemicalBuilder builder){
+		InchiAtom[] atoms = stereo.getAtoms();
+		Optional<? extends Bond> foundBond = builder.getBond(atomMap.get(atoms[0]), atomMap.get(atoms[1]));
+		if(foundBond.isPresent()){
+//
+//			switch(stereo.getParity()){
+//				case ODD: foundBond.get().setDoubleBondStereo(DoubleBondStereo.);
+//			}
+//			foundBond.get().setDoubleBondStereo(DoubleBondStereochemistry.DoubleBondStereo.);
+		}
+
+	}
+
+	private static void setTetrahedral(InchiStereo stereo, Map<InchiAtom, Atom> atomMap, ChemicalBuilder builder){
+		Atom central = atomMap.get(stereo.getCentralAtom());
+
+		InchiAtom[] atoms = stereo.getAtoms();
+		builder.addTetrahedralStereo(central, Chirality.valueByParity(stereo.getParity().ordinal()),
+				atomMap.get(atoms[0]), atomMap.get(atoms[1]));
+
+
+	}
+
+	private static void setExtendedTetrahedral(InchiStereo stereo, Map<InchiAtom, Atom> atomMap, ChemicalBuilder builder){
+		Atom central = atomMap.get(stereo.getCentralAtom());
+
+		InchiAtom[] atoms = stereo.getAtoms();
+		Set<Atom> terminalAtoms = new LinkedHashSet<>();
+		for(InchiAtom a : atoms){
+			Atom atom = atomMap.get(a);
+			for(Bond b : atom.getBonds()){
+				Atom otherAtom = b.getOtherAtom(atom);
+				if(otherAtom.getAtomicNumber() !=1){
+					terminalAtoms.add(otherAtom);
+				}
+			}
+		}
+		if(terminalAtoms.size() !=2){
+			throw new IllegalArgumentException("could not find 2 terminal atoms");
+		}
+		Atom[] terminalArray = terminalAtoms.toArray(new Atom[2]);
+		builder.addExtendedTetrahedralStereo(central, terminalArray[0], terminalArray[1], Chirality.valueByParity(stereo.getParity().ordinal()),
+				atomMap.get(atoms[0]), atomMap.get(atoms[1]));
+
+
+	}
+
+	private static class InchiSource implements ChemicalSource{
+		private final String inchi;
+
+		public InchiSource(String inchi) {
+			this.inchi = inchi;
+		}
+
+		@Override
+		public Type getType() {
+			return Type.INCHI;
+		}
+
+		@Override
+		public String getData() {
+			return inchi;
+		}
+
+		@Override
+		public Map<String, String> getProperties() {
+			return null;
+		}
 	}
 }
