@@ -22,8 +22,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import gov.nih.ncats.common.util.CachedSupplier;
+import gov.nih.ncats.common.util.SingleThreadCounter;
 import gov.nih.ncats.molwitch.*;
 import gov.nih.ncats.molwitch.spi.InchiImplFactory;
 import io.github.dan2097.jnainchi.*;
@@ -154,6 +156,7 @@ public final class Inchi {
 		Map<InchiAtom, Atom> atomMap = new HashMap<>();
 		for(InchiAtom atom : inchiInput.getAtoms()){
 			Atom a = builder.addAtom(atom.getElName());
+			a.setAtomCoordinates(AtomCoordinates.valueOf(atom.getX(), atom.getY(), atom.getZ()));
 //			if(atom.getCharge() !=0) {
 //				a.setCharge(atom.getCharge());
 //			}
@@ -206,20 +209,30 @@ public final class Inchi {
 			}
 		}
 		
-		builder.computeStereo(true);
+//		builder.computeStereo(true);
 		builder.setSource(new InchiSource(originalInchiString));
 		return builder;
 	}
 
 	private static void setDoubleBondStereo(InchiStereo stereo, Map<InchiAtom, Atom> atomMap, ChemicalBuilder builder){
+
 		InchiAtom[] atoms = stereo.getAtoms();
-		Optional<? extends Bond> foundBond = builder.getBond(atomMap.get(atoms[0]), atomMap.get(atoms[1]));
+		Map<Atom, SingleThreadCounter> counterMap = new HashMap<>();
+		Atom[] builderAtoms = new Atom[4];
+		int i=0;
+		for(InchiAtom a : atoms) {
+			Atom atom = atomMap.get(a);
+			builderAtoms[i++] = atom;
+			for(Bond b : atom.getBonds()){
+				counterMap.computeIfAbsent(b.getOtherAtom(atom), x -> new SingleThreadCounter()).increment();
+			}
+		}
+		List<Atom> doubleBondAtoms = counterMap.entrySet().stream().filter(e -> e.getValue().getAsInt() ==2).map(Map.Entry::getKey).collect(Collectors.toList());
+		Optional<? extends Bond> foundBond = builder.getBond(doubleBondAtoms.get(0), doubleBondAtoms.get(1));
 		if(foundBond.isPresent()){
-//
-//			switch(stereo.getParity()){
-//				case ODD: foundBond.get().setDoubleBondStereo(DoubleBondStereo.);
-//			}
-//			foundBond.get().setDoubleBondStereo(DoubleBondStereochemistry.DoubleBondStereo.);
+
+			//need to figure out E or Z
+			builder.addDoubleBondStereo(foundBond.get(), Bond.DoubleBondStereo.E_TRANS,builderAtoms[0], builderAtoms[1],builderAtoms[2],builderAtoms[3]);
 		}
 
 	}
@@ -228,8 +241,9 @@ public final class Inchi {
 		Atom central = atomMap.get(stereo.getCentralAtom());
 
 		InchiAtom[] atoms = stereo.getAtoms();
+
 		builder.addTetrahedralStereo(central, Chirality.valueByParity(stereo.getParity().ordinal()),
-				atomMap.get(atoms[0]), atomMap.get(atoms[1]));
+				Arrays.stream(atoms).map(atomMap::get).toArray(i-> new Atom[i]));
 
 
 	}
@@ -253,7 +267,7 @@ public final class Inchi {
 		}
 		Atom[] terminalArray = terminalAtoms.toArray(new Atom[2]);
 		builder.addExtendedTetrahedralStereo(central, terminalArray[0], terminalArray[1], Chirality.valueByParity(stereo.getParity().ordinal()),
-				atomMap.get(atoms[0]), atomMap.get(atoms[1]));
+				Arrays.stream(atoms).map(atomMap::get).toArray(i-> new Atom[i]));
 
 
 	}

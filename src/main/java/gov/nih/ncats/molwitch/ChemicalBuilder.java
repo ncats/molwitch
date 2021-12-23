@@ -395,8 +395,8 @@ public class ChemicalBuilder {
 		
 		return impl.addBond(atom1, atom2, type);
 	}
-	public  TetrahedralChirality addDoubleBondStereo( Atom carbonAtom1, Atom carbonAtom2, Chirality chirality, Atom... peripheralAtoms){
-		return impl.addDoubleBondStereo(carbonAtom1, carbonAtom2, chirality, peripheralAtoms);
+	public  DoubleBondStereochemistry addDoubleBondStereo(Bond doubleBond, Bond.DoubleBondStereo stereo,  Atom... peripheralAtoms){
+		return impl.addDoubleBondStereo(doubleBond, stereo, peripheralAtoms);
 	}
 	public  TetrahedralChirality addTetrahedralStereo(Atom centerAtom, Chirality chirality, Atom... peripheralAtoms){
 		return impl.addTetrahedralStereo(centerAtom, chirality, peripheralAtoms);

@@ -160,7 +160,7 @@ public interface ChemicalImpl<T extends ChemicalImpl<T>> {
 
 	ExtendedTetrahedralChirality addExtendedTetrahedralStereo(Atom centerAtom, Atom terminalAtom1, Atom terminalAtom2, Chirality chirality, Atom[] peripheralAtoms);
 
-	DoubleBondStereochemistry addDoubleBondStereo(Atom carbonAtom1, Atom carbonAtom2, Chirality chirality, Atom[] peripheralAtoms);
+	DoubleBondStereochemistry addDoubleBondStereo(Bond doubleBond, Bond.DoubleBondStereo stereo, Atom[] peripheralAtoms);
 
 	public static final class PreparationOptions{
 		public final boolean aromatize, makeHydrogensExplicit, computeCoords, computeStereo;

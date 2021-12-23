@@ -20,12 +20,13 @@ package gov.nih.ncats.molwitch;
 
 /**
  * CIS or TRANS
- *
+ * <pre>
  * A        X
  *  \     /
  *   C = C
  *  /     \
  * H       H
+ * </pre>
  */
 public interface DoubleBondStereochemistry {
 
@@ -34,7 +35,7 @@ public interface DoubleBondStereochemistry {
      * on which atom in the bond is the stereo center and
      * which direction the bond is.
      */
-    public enum DoubleBondStereo {
+    enum DoubleBondStereo {
 		/** A bond for which there is no stereochemistry. */
 		NONE,
 		
