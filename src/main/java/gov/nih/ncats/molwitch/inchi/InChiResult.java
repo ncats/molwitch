@@ -19,6 +19,7 @@
 package gov.nih.ncats.molwitch.inchi;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public final class InChiResult {
 
@@ -26,7 +27,7 @@ public final class InChiResult {
 	private final String auxInfo;
 	private final String inchi;
 	private final String message;
-	private final Status stuatus;
+	private final Status status;
 	
 	public enum Status{
 		VALID,
@@ -41,15 +42,15 @@ public final class InChiResult {
 				", auxInfo='" + auxInfo + '\'' +
 				", inchi='" + inchi + '\'' +
 				", message='" + message + '\'' +
-				", stuatus=" + stuatus +
+				", stuatus=" + status +
 				'}';
 	}
 
-	private InChiResult(Status stuatus, String key, String inchi, String auxInfo, String message) {
-		Objects.requireNonNull(stuatus);
+	private InChiResult(Status status, String key, String inchi, String auxInfo, String message) {
+		Objects.requireNonNull(status);
 		Objects.requireNonNull(key);
 		Objects.requireNonNull(inchi);
-		this.stuatus = stuatus;
+		this.status = status;
 		
 		this.key = key;
 		this.inchi = inchi;
@@ -62,7 +63,22 @@ public final class InChiResult {
 		return message;
 	}
 
-
+	/**
+	 * Get the {@link InchiKey} object.
+	 * @return an Optional wrapped {@link InchiKey} object as for this inchi key.
+	 * @see #getKey()
+	 */
+	public Optional<InchiKey> getInchiKey(){
+		if(this.status == Status.ERROR ||  key==null || key.isEmpty()){
+			return Optional.empty();
+		}
+		return Optional.of(new InchiKey(key));
+	}
+	/**
+	 * Get the Inchi key as a String.
+	 * @return the inchi key as a String.
+	 * @see #getInchiKey()
+	 */
 	public String getKey() {
 		return key;
 	}

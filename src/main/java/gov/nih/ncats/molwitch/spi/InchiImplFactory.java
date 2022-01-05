@@ -26,6 +26,12 @@ import gov.nih.ncats.molwitch.inchi.InChiResult;
 public interface InchiImplFactory {
 
 	InChiResult asStdInchi(Chemical chemical, boolean trustCoordinates) throws IOException;
-	
+
+	/**
+	 * Parse the given full inchi into a Chemical object.
+	 * @param inchi the full inchi as a String.  This should be prefixed with "InChI=1S/" in most cases.
+	 * @return a new Chemical object or null if not supported.
+	 * @throws IOException if there is a problem parsing the inchi.
+	 */
 	Chemical parseInchi(String inchi) throws IOException;
 }

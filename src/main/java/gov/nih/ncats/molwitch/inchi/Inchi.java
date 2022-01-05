@@ -19,9 +19,7 @@
 package gov.nih.ncats.molwitch.inchi;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +40,34 @@ public final class Inchi {
 	});
 	private static Pattern STD_INCHI_PREFIX = Pattern.compile("^\\s*InChI=1S/");
 
+	/**
+	 * Convert the given Mol formatted String into an {@link InChiResult}
+	 * object.
+	 * @implNote this method will first try to use the raw mol file
+	 * but there are problems converting it into an inchi directly,
+	 * the mol will be parsed into a {@link Chemical} and then passed to {@link #asStdInchi(Chemical, boolean)}
+	 * so this method should only be used if the caller doesn't already have a {@link Chemical}
+	 * object as it might incur a performance penalty.
+	 * @param mol the mol formatted record to parse as a String.
+	 * @return an {@link InChiResult}
+	 * @throws IOException if there was a problem parsing the mol data.
+	 * @throws NullPointerException if mol is null.
+	 */
+	public static InChiResult computeInchiFromMol(String mol) throws IOException{
+		Optional<InChiResult> result = inchiFromMol(Objects.requireNonNull(mol));
+		if(result.isPresent()){
+			return result.get();
+		}
+		return asStdInchi(Chemical.parseMol(mol), true);
+	}
+
+	/**
+	 * Compute the inchi of the given {@link Chemical}.
+	 * @param chemical the {@link Chemical} to compute the inchi for.
+	 * @return an {@link InChiResult}.
+	 * @throws IOException if there is a problem computing the inchi.
+	 * @throws NullPointerException if chemical is null.
+	 */
 	public static InChiResult asStdInchi(Chemical chemical) throws IOException{
 		return asStdInchi(chemical, true);
 	}
@@ -62,6 +88,29 @@ public final class Inchi {
 				.isPresent();
 		return !hasProblemAtoms;
 	}
+
+	private static Optional<InChiResult> inchiFromMol(String molText){
+		//JNA-inchi can take mol files
+		InchiOutput output = JnaInchi.molToInchi(molText);
+
+
+		if (output.getStatus() == InchiStatus.SUCCESS || output.getStatus() == InchiStatus.WARNING) {
+			InChiResult.Builder builder = new InChiResult.Builder(convertEnumStatus(output.getStatus()));
+			builder.setMessage(output.getMessage() == null ? "" : output.getMessage());
+			builder.setAuxInfo(output.getAuxInfo() == null ? "" : output.getAuxInfo());
+
+			String fullInchi = output.getInchi();
+			builder.setInchi(fullInchi);
+			InchiKeyOutput keyOutput = JnaInchi.inchiToInchiKey(fullInchi);
+			if (keyOutput.getStatus() == InchiKeyStatus.OK) {
+				builder.setKey(keyOutput.getInchiKey());
+			}else{
+				builder.setKey("");
+			}
+			return Optional.of(builder.build());
+		}
+		return Optional.empty();
+	}
 	public static InChiResult asStdInchi(Chemical chemical, boolean trustCoordinates) throws IOException{
 		//1. first see if we can use the jna-inchi and try that if we call.
 		//2. fall back to using the inchi implementation of the molwitch flavor:
@@ -76,26 +125,10 @@ public final class Inchi {
 //											.setKekulization(ChemFormat.KekulizationEncoding.KEKULE)
 //											.setHydrogenEncoding(ChemFormat.HydrogenEncoding.MAKE_EXPLICIT));
 			String molText = chemical.toMol();
-			//JNA-inchi can take mol files
-			InchiOutput output = JnaInchi.molToInchi(molText);
-
-
-			if (output.getStatus() == InchiStatus.SUCCESS || output.getStatus() == InchiStatus.WARNING) {
-				InChiResult.Builder builder = new InChiResult.Builder(convertEnumStatus(output.getStatus()));
-				builder.setMessage(output.getMessage() == null ? "" : output.getMessage());
-				builder.setAuxInfo(output.getAuxInfo() == null ? "" : output.getAuxInfo());
-
-				String fullInchi = output.getInchi();
-				builder.setInchi(fullInchi);
-				InchiKeyOutput keyOutput = JnaInchi.inchiToInchiKey(fullInchi);
-				if (keyOutput.getStatus() == InchiKeyStatus.OK) {
-					builder.setKey(keyOutput.getInchiKey());
-				}else{
-					builder.setKey("");
-				}
-				return builder.build();
+			Optional<InChiResult> result = inchiFromMol(molText);
+			if(result.isPresent()){
+				return result.get();
 			}
-
 		}
 		//if we can't get the inchi for some reason fall back and ask the molwitch implementation to do it
 		return computeInchiFromFactory(chemical, trustCoordinates);
@@ -111,17 +144,37 @@ public final class Inchi {
 		}
 		throw new IOException("could not find suitable inchi writer");
 	}
-	
+
+	/**
+	 * Create a {@link Chemical} from the input full inchi string.
+	 * @param inchi the full inchi string.  If the String does not start with "InChI=1S/"
+	 *              then it is assumed to be a standard version 1 inchi.
+	 * @return a Chemical representing the same structure as the input full inchi.
+	 * @throws IOException if there is a problem parsing the inchi or if inchi
+	 * to Chemical conversion is not supported by the molwitch flavor.
+	 */
 	public static Chemical toChemical(String inchi) throws IOException{
 		Matcher matcher = STD_INCHI_PREFIX.matcher(inchi);
+		String input;
 		if(!matcher.find()) {
-			//TODO should we error out here?
+			input = "InChI=1S/"+inchi;
+		}else{
+			input = inchi;
 		}
+		Throwable throwable = null;
 		for(InchiImplFactory impl : implLoaders.get()) {
-			Chemical result =  impl.parseInchi(inchi);
-			if(result !=null) {
-				return result;
+
+			try {
+				Chemical result = impl.parseInchi(input);
+				if (result != null) {
+					return result;
+				}
+			}catch(Throwable t){
+				throwable = t;
 			}
+		}
+		if(throwable !=null){
+			throw new IOException("could not find suitable inchi parser", throwable);
 		}
 		throw new IOException("could not find suitable inchi parser");
 	}
