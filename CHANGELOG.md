@@ -2,6 +2,10 @@
 ## 0.6.1
 1. added new CtTable Clean Rule M  SAL lines with atom positions &lt; 1 are removed from the atom list
 1. MolSearcherFactory now returns an `Optional<MolSearcher>` to support not finding a searcher. Previously would throw NoSuchElementException.
+1. added new InchiKey object with helper methods to do exact vs inexact matching.
+1. log4j dependency updates
+1. removed jni-inchi dependency and now use jna-inchi which bumps inchi version from 1.03 to 1.06
+1. added direct mol file to inchi support.
 
 ## 0.6.0
 1. removed `Atom#getRadicalValue()` since we also have `Atom#getRadical()`

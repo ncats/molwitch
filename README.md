@@ -14,7 +14,7 @@ This adds the API.
 <dependency>
   <groupId>gov.nih.ncats</groupId>
   <artifactId>molwitch</artifactId>
-  <version>0.6.0</version>
+  <version>0.6.1</version>
 </dependency>
 ```
 
@@ -25,7 +25,7 @@ To add [molwitch-CDK](https://github.com/ncats/molwitch-cdk) :
 <dependency>
         <groupId>gov.nih.ncats</groupId>
         <artifactId>molwitch-cdk</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.8</version>
 </dependency>
 ```
 
