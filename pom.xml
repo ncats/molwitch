@@ -24,7 +24,7 @@
 
     <groupId>gov.nih.ncats</groupId>
     <artifactId>molwitch</artifactId>
-    <version>0.6.1-SNAPSHOT</version>
+    <version>0.6.2</version>
 
     <name>ncats-molwitch</name>
 
@@ -87,7 +87,7 @@
         <dependency>
             <groupId>io.github.dan2097</groupId>
             <artifactId>jna-inchi-all</artifactId>
-            <version>1.0</version>
+            <version>1.0.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
