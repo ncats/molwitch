@@ -28,20 +28,7 @@ import java.util.regex.Pattern;
  * with helper methods for pulling out various parts of an inchi key.
  */
 public class InchiKey {
-    /*
-    The first 14 characters result from a SHA-256 hash of the connectivity information
-    (the main layer and /q sublayer of the charge layer) of the InChI
 
-    a single character indicating the kind of InChIKey (S for standard and N for nonstandard),
-    and a character indicating the version of InChI used (currently A for version 1.)
-    Finally, the single character at the end indicates the protonation of the core parent structure,
-    corresponding to the /p sublayer of the charge layer (N for no protonation, O, P, ... if protons should
-     be added and M, L, ... if they should be removed.)
-
-     14, 10 and one character(s), respectively, like XXXXXXXXXXXXXX-YYYYYYYYFV-P
-     */
-
-    private static Pattern PATTERN = Pattern.compile("^[A-Z]{14}\\-[A-Z]{10}\\-[A-Z]$");
 
     private final String data;
 
@@ -66,11 +53,11 @@ public class InchiKey {
      */
     public InchiKey(String data) {
 
-        if(!PATTERN.matcher(data).matches()){
+        if(!InchiUtil.isValidInchiKey(data)){
             throw new IllegalArgumentException("not in inchi key format: "+ data);
         }
-        this.data = Objects.requireNonNull(data);
-        this.connectivity = data.substring(0, 14);
+        this.data = data;
+        this.connectivity = InchiUtil.getConnectivityLayer(data);
 
     }
 

@@ -1,4 +1,7 @@
 # Molwitch API Changelog
+## 0.6.3
+1. refactored InchiKeyBag into an interface and made Default and Binary implementations
+
 ## 0.6.2
 1. added new CtTable Clean Rule M  SAL lines with atom positions &lt; 1 are removed from the atom list
 1. MolSearcherFactory now returns an `Optional<MolSearcher>` to support not finding a searcher. Previously would throw NoSuchElementException.
