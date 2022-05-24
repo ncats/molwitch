@@ -112,6 +112,16 @@ public final class ChemicalReaderFactory {
 		}
 		return new DefaultChemicalReader(factory.create(in));
 	}
+
+	public static ChemicalReader newReader(InputStream in, String encoding) throws IOException{
+		Objects.requireNonNull(in, "inputstream can not be null");
+		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory();
+		if(factory ==null) {
+			throw new IOException("could not find chemical factory");
+		}
+		return new DefaultChemicalReader(factory.create(in, encoding));
+	}
+
 	public static ChemicalReader newReader(String format, InputStream in) throws IOException{
 		Objects.requireNonNull(in, "inputstream can not be null");
 		ChemicalImplFactory factory = ImplUtil.getChemicalImplFactory(format);

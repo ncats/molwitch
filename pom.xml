@@ -24,7 +24,7 @@
 
     <groupId>gov.nih.ncats</groupId>
     <artifactId>molwitch</artifactId>
-    <version>0.6.2</version>
+    <version>0.6.3</version>
 
     <name>ncats-molwitch</name>
 
@@ -99,6 +99,12 @@
             <groupId>uk.ac.cam.ch.opsin</groupId>
             <artifactId>opsin-core</artifactId>
             <version>2.6.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-api</artifactId>
+				</exclusion>
+			</exclusions>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

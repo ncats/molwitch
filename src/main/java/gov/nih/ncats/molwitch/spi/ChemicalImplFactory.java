@@ -182,6 +182,19 @@ public interface ChemicalImplFactory {
 	 */
 	ChemicalImplReader create(InputStream in) throws IOException;
 	/**
+	 * Parse the given {@link InputStream} and create all the {@link ChemicalImpl}s encoded inside it.
+	 * The file format of the streamed file is not provided so it could be any of the
+	 * standard cheminformatics file formats.
+	 *
+	 * @param in the {@link InputStream} to parse.
+	 * @param in the {@link String} to parse.
+	 *
+	 * @return a List of {@link ChemicalImpl}, will never be null, and shouldn't be empty.
+	 *
+	 * @throws IOException if there is a problem parsing the InputStream.
+	 */
+	ChemicalImplReader create(InputStream in, String encoding) throws IOException;
+	/**
 	 * Create a new {@link ChemicalImpl} object
 	 * that is doesn't have any atoms
 	 * or bonds.  Clients can then
