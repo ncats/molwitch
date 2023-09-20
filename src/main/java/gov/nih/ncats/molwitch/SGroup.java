@@ -154,4 +154,7 @@ public interface SGroup {
 
 	Optional<String> getSuperatomLabel();
 	boolean bracketsTrusted();
+
+	Chemical getParentChemical();
+	void setParentChemical(Chemical chem);
 }
