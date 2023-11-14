@@ -43,7 +43,7 @@ public final class Inchi {
 	/**
 	 * Convert the given Mol formatted String into an {@link InChiResult}
 	 * object.
-	 * @implNote this method will first try to use the raw mol file
+	 * <strong>Implementation Note</strong>: this method will first try to use the raw mol file
 	 * but there are problems converting it into an inchi directly,
 	 * the mol will be parsed into a {@link Chemical} and then passed to {@link #asStdInchi(Chemical, boolean)}
 	 * so this method should only be used if the caller doesn't already have a {@link Chemical}

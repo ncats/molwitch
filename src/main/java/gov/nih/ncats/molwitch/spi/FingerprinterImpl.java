@@ -48,7 +48,7 @@ public interface FingerprinterImpl{
 	 * 
 	 * @return {@code true} if it does support it; {@code false} otherwise.
 	 * 
-	 * @apiNote the default implemenation where {@link #isDefault()}
+	 * <strong>API Note</strong>: the default implementation where {@link #isDefault()}
 	 * returns {@code true} should always return true.
 	 */
 	boolean supports(FingerprintSpecification spec);
@@ -79,7 +79,7 @@ public interface FingerprinterImpl{
 	 * Create a new Fingerprinter object using the default
 	 * implementation with default settings.
 	 * 
-	 * @apiNote by default, this method throws UnsupportedOperationException
+	 * <strong>API Note</strong>: by default, this method throws UnsupportedOperationException
 	 * for all implementations where {@link #isDefault()} returns {@code false}.
 	 * This should only be implemented by the implementation where {@link #isDefault()}
 	 * returns {@code true}.
