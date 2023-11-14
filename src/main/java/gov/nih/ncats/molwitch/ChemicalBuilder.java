@@ -134,7 +134,7 @@ public class ChemicalBuilder {
 	 * @throws NullPointerException if smiles is null.
 	 * @see #createFromMol(String, Charset)
 	 * 
-	 * @apiNote this is the same as calling {@code createFromMol(rawMol, Charset.defaultCharset());}.
+	 * <strong>API Note</strong>: this is the same as calling {@code createFromMol(rawMol, Charset.defaultCharset());}.
 	 */
 	public static ChemicalBuilder createFromMol(String rawMol) throws IOException{
 		return createFromMol(rawMol, Charset.defaultCharset());

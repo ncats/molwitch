@@ -32,7 +32,7 @@ public interface ChemicalWriterImplFactory {
 	 * Write the given Chemical with the given format specification
 	 * and return the result as a String.
 	 *
-	 * @implNote  by default this executes the code below
+	 * <strong>Implementation Note</strong>: by default this executes the code below
 	 * but should be overridden if there is a more efficient way:
 	 * <pre>
 	 * {@code
