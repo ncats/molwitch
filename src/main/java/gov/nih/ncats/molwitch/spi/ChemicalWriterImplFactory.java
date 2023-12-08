@@ -1,7 +1,7 @@
 /*
  * NCATS-MOLWITCH
  *
- * Copyright 2019 NIH/NCATS
+ * Copyright 2023 NIH/NCATS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ public interface ChemicalWriterImplFactory {
 	 * Write the given Chemical with the given format specification
 	 * and return the result as a String.
 	 *
-	 * @implNote  by default this executes the code below
+	 * <strong>Implementation Note</strong>: by default this executes the code below
 	 * but should be overridden if there is a more efficient way:
 	 * <pre>
 	 * {@code

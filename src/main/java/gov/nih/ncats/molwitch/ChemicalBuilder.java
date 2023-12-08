@@ -1,7 +1,7 @@
 /*
  * NCATS-MOLWITCH
  *
- * Copyright 2019 NIH/NCATS
+ * Copyright 2023 NIH/NCATS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -134,7 +134,7 @@ public class ChemicalBuilder {
 	 * @throws NullPointerException if smiles is null.
 	 * @see #createFromMol(String, Charset)
 	 * 
-	 * @apiNote this is the same as calling {@code createFromMol(rawMol, Charset.defaultCharset());}.
+	 * <strong>API Note</strong>: this is the same as calling {@code createFromMol(rawMol, Charset.defaultCharset());}.
 	 */
 	public static ChemicalBuilder createFromMol(String rawMol) throws IOException{
 		return createFromMol(rawMol, Charset.defaultCharset());

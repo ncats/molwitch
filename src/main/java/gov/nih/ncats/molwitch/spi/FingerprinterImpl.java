@@ -1,7 +1,7 @@
 /*
  * NCATS-MOLWITCH
  *
- * Copyright 2019 NIH/NCATS
+ * Copyright 2023 NIH/NCATS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public interface FingerprinterImpl{
 	 * 
 	 * @return {@code true} if it does support it; {@code false} otherwise.
 	 * 
-	 * @apiNote the default implemenation where {@link #isDefault()}
+	 * <strong>API Note</strong>: the default implementation where {@link #isDefault()}
 	 * returns {@code true} should always return true.
 	 */
 	boolean supports(FingerprintSpecification spec);
@@ -79,7 +79,7 @@ public interface FingerprinterImpl{
 	 * Create a new Fingerprinter object using the default
 	 * implementation with default settings.
 	 * 
-	 * @apiNote by default, this method throws UnsupportedOperationException
+	 * <strong>API Note</strong>: by default, this method throws UnsupportedOperationException
 	 * for all implementations where {@link #isDefault()} returns {@code false}.
 	 * This should only be implemented by the implementation where {@link #isDefault()}
 	 * returns {@code true}.
