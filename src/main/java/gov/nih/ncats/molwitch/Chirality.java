@@ -32,7 +32,15 @@ public enum Chirality {
 	 * Sinister (left, even). priority decreases in counterclockwise direction.
 	 */
 	S(2),
-	Parity_Either(3);
+	Parity_Either(3),
+	/**
+	 * Psuedo-Rectus (right, odd). Priority decreases in clockwise direction.
+	 */
+	r(4),
+	/**
+	 * Psuedo-Sinister (left, even). priority decreases in counterclockwise direction.
+	 */
+	s(5);
 	
 	
 	
@@ -42,8 +50,8 @@ public enum Chirality {
 	private static final Chirality[] VALUES;
 	private static final Chirality[] INVERTED;
 	static {
-		VALUES = new Chirality[] {Non_Chiral, R, S, Parity_Either};
-		INVERTED = new Chirality[] {Unknown,Non_Chiral, S, R, Parity_Either};
+		VALUES = new Chirality[] {Non_Chiral, R, S, Parity_Either, r, s};
+		INVERTED = new Chirality[] {Unknown,Non_Chiral, S, R, Parity_Either, s, r};
 		
 	}
 	Chirality(int v){
@@ -65,9 +73,19 @@ public enum Chirality {
 	public int getParity(){
 		return parity;
 	}
+	public boolean isRForm() {
+		return parity==1 || parity==4;
+	}
+	public boolean isSForm() {
+		return parity==2 || parity==5;
+	}
+	
+	public boolean isDefined() {
+		return parity==2 || parity==1 || parity==4 || parity==5;
+	}
 	
 	public static Chirality valueByParity(int parity) {
-		if(parity <0 || parity > 3) {
+		if(parity <0 || parity > 5) {
 			return Unknown;
 		}
 		return VALUES[parity];

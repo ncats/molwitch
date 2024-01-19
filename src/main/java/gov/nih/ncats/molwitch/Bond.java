@@ -250,6 +250,10 @@ public interface Bond {
 		 *  Z (from zusammen, the German word for "together").
 		 */
 		Z_CIS;
+
+		public boolean isDefined() {
+			return this == Z_CIS || this == E_TRANS;
+		}
 		
     }
 
