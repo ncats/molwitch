@@ -1,7 +1,7 @@
 /*
  * NCATS-MOLWITCH
  *
- * Copyright 2023 NIH/NCATS
+ * Copyright 2024 NIH/NCATS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import gov.nih.ncats.molwitch.*;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import gov.nih.ncats.molwitch.Bond.BondType;
@@ -228,6 +229,7 @@ public interface ChemicalImpl<T extends ChemicalImpl<T>> {
 	void expandSGroups();
 	void generateCoordinates() throws MolwitchException;
 	void flipChirality(Stereocenter s);
-	
-	
+
+	void applyParameters(Map<String, Object> params);
+
 }
