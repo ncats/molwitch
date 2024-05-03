@@ -21,6 +21,7 @@ package gov.nih.ncats.molwitch.spi;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import gov.nih.ncats.common.io.InputStreamSupplier;
 
@@ -219,4 +220,9 @@ public interface ChemicalImplFactory {
      * @since 0.5.2
      */
     boolean isFormatAgnostic();
+
+	static void applyParameters(Map<String, Object> params) {
+		System.out.println("ChemicalImplFactory default applyParameters");
+		//default does nothing; individual implementations _can_ do something
+	}
 }
