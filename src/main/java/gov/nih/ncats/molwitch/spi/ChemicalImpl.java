@@ -230,4 +230,7 @@ public interface ChemicalImpl<T extends ChemicalImpl<T>> {
 	void generateCoordinates() throws MolwitchException;
 	void flipChirality(Stereocenter s);
 
+	default Class getFactoryClass() {
+		return ChemicalImplFactory.class;
+	}
 }
