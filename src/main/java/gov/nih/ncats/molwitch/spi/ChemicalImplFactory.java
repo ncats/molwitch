@@ -221,8 +221,7 @@ public interface ChemicalImplFactory {
      */
     boolean isFormatAgnostic();
 
-	static void applyParameters(Map<String, Object> params) {
-		System.out.println("ChemicalImplFactory default applyParameters");
+	default void applyParameters(Map<String, Object> params) {
 		//default does nothing; individual implementations _can_ do something
 	}
 }
