@@ -1,7 +1,7 @@
 /*
  * NCATS-MOLWITCH
  *
- * Copyright 2023 NIH/NCATS
+ * Copyright 2024 NIH/NCATS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import java.io.IOException;
 import gov.nih.ncats.molwitch.Chemical;
 import gov.nih.ncats.molwitch.inchi.InChiResult;
 
-public interface InchiImplFactory {
+	public interface InchiImplFactory {
 
 	InChiResult asStdInchi(Chemical chemical, boolean trustCoordinates) throws IOException;
 

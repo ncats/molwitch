@@ -1,7 +1,7 @@
 /*
  * NCATS-MOLWITCH
  *
- * Copyright 2023 NIH/NCATS
+ * Copyright 2024 NIH/NCATS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ package gov.nih.ncats.molwitch.spi;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import gov.nih.ncats.common.io.InputStreamSupplier;
 
@@ -219,4 +220,8 @@ public interface ChemicalImplFactory {
      * @since 0.5.2
      */
     boolean isFormatAgnostic();
+
+	default void applyParameters(Map<String, Object> params) {
+		//default does nothing; individual implementations _can_ do something
+	}
 }
