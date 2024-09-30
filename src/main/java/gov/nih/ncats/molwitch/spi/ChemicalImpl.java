@@ -230,5 +230,11 @@ public interface ChemicalImpl<T extends ChemicalImpl<T>> {
 	void generateCoordinates() throws MolwitchException;
 	void flipChirality(Stereocenter s);
 
+	ChemicalImpl flipAllChiralCenters();
+
+	ChemicalImpl flipEpimericChiralCenters();
+
+	List<Chemical> permuteEpimers();
+
 	List<String> getSGroupWarnings();
 }
