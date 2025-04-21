@@ -1,7 +1,7 @@
 /*
  * NCATS-MOLWITCH
  *
- * Copyright 2024 NIH/NCATS
+ * Copyright 2025 NIH/NCATS
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -229,6 +229,14 @@ public interface ChemicalImpl<T extends ChemicalImpl<T>> {
 	void expandSGroups();
 	void generateCoordinates() throws MolwitchException;
 	void flipChirality(Stereocenter s);
+
+	Chemical flipAllChiralCenters();
+
+	Chemical flipEpimericChiralCenters();
+
+	List<Chemical> permuteEpimers();
+
+	List<Chemical> permuteEpimersAndEnantiomers();
 
 	List<String> getSGroupWarnings();
 }
